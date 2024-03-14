@@ -1,0 +1,86 @@
+
+namespace Player.PlayerMovement // Namespace for managing player movement
+{
+    // Class representing the character's climb state, inheriting from CharacterBaseState
+    public class CharacterClimbState : CharacterBaseState
+    {
+        // Method called when entering the climb state
+        public override void EnterState()
+        {
+            // Disables jump action, resets attacking flag, resets jump count, and sets gravity scale to 0
+            characterInput.JumpAction.action.Disable();
+            stats.IsAttacking = false;
+            stats.NumberOfJumps = 0;
+            characterComponents.Rb.gravityScale = 0;
+        }
+
+        // Method called to update the climb state
+        public override void UpdateState()
+        {
+            // Moves character on the wall and ledge
+            MoveOnWall();
+            MoveOnLedge();
+        }
+
+        // Method called during fixed update for physics calculations
+        public override void FixedUpdate()
+        {
+            // Moves character vertically and horizontally based on move vector and speed
+            characterMovement.MoveVertically(stats.MoveVector.y * stats.MoveSpeed);
+            characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
+        }
+
+        // Method called when exiting the climb state
+        public override void ExitState()
+        {
+            // Resets gravity scale and enables jump action
+            characterComponents.Rb.gravityScale = 5;
+            characterInput.JumpAction.action.Enable();
+        }
+
+        // Method to handle movement on the wall
+        private void MoveOnWall()
+        {
+            // Skips if ledge is detected
+            if (detectionStats.IsLedgeDetected) return;
+
+            // Switches animation based on vertical velocity
+            switch (stats.VelocityY)
+            {
+                case > 0:
+                case < 0:
+                    characterAnimation.ChangeAnimationState(characterAnimation.wallClimbAnim, 0.1f);
+                    break;
+                case 0:
+                    characterAnimation.ChangeAnimationState(characterAnimation.wallIdleAnim, 0.1f);
+                    break;
+            }
+        }
+
+        // Method to handle movement on the ledge
+        private void MoveOnLedge()
+        {
+            // Changes animation to ledge idle if ledge is detected but no input for ledge climb
+            if (detectionStats.IsLedgeDetected && !characterDetection.IsInputForLedgeClimb)
+            {
+                characterAnimation.ChangeAnimationState(characterAnimation.ledgeIdleAnim, 0.1f);
+            }
+
+            // Changes animation to ledge climb if ledge is detected and input for ledge climb
+            if (detectionStats.IsLedgeDetected && characterDetection.IsInputForLedgeClimb)
+            {
+                characterAnimation.ChangeAnimationState(characterAnimation.ledgeClimbAnim, 0.1f);
+            }
+        }
+
+        // Constructor initializing the base state with necessary components
+        public CharacterClimbState(CharacterStateMachine currentContext, CharacterStateFactory characterStateFactory,
+            CharacterStats characterStats, DetectionStats detectionStats, CharacterDetection characterDetection,
+            CharacterComponents components, CharacterInput input, CharacterDash characterDash,
+            CharacterMovement characterMovement, CharacterJump characterJump, CharacterAnimation characterAnimation) 
+            : base(currentContext, characterStateFactory, characterStats, detectionStats, characterDetection,
+                components, input, characterDash, characterMovement, characterJump, characterAnimation)
+        {
+        }
+    }
+}
