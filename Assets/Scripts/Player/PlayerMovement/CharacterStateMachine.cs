@@ -20,6 +20,7 @@ namespace Player.PlayerMovement
         [SerializeField] private CharacterJump characterJump;
         [SerializeField] private CharacterAnimation characterAnimation;
 
+        //testtesttest
         // Called when the script instance is being loaded
         private void Awake()
         {
@@ -44,32 +45,37 @@ namespace Player.PlayerMovement
             if (currentState != states.Climb()) characterAnimation.UpdateSpriteDirection();
         }
         
+        
+        
         // Switches between different character states based on conditions
         private void StateSwitcher()
         {
-            if (characterDetection.IsGrounded() && !characterStats.IsJump)
+            if (detectionStats.IsGrounded && !characterStats.IsJump ||detectionStats.IsOnPlatform && !characterStats.IsJump)
             {
                 CheckState(states.Grounded());
             }
 
-            if (characterStats.IsJump || !characterDetection.IsGrounded())
+            if (characterStats.IsJump || !detectionStats.IsGrounded &&!detectionStats.IsOnPlatform && !detectionStats.IsLedgeDetected &&
+                !detectionStats.IsWall)
             {
                 CheckState(states.Air());
             }
 
-            if (characterDetection.IsWall() && !characterDetection.IsGrounded())
+            if (detectionStats.IsWall && !detectionStats.IsGrounded && !detectionStats.IsOnPlatform && detectionStats.WallCollisionRadius > 0)
             {
                 CheckState(states.Climb());
             }
         }
+
+       
 
         // Checks and transitions to a new state if necessary
         private void CheckState(CharacterBaseState newState)
         {
             if (currentState == newState) return;
             currentState.ExitState();
-            newState.EnterState();
             currentState = newState;
+            currentState.EnterState();
         }
 
         // Loads character data from a save file

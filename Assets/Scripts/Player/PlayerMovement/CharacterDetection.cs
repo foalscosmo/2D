@@ -6,44 +6,59 @@ namespace Player.PlayerMovement // Namespace for managing player movement
     public class CharacterDetection : MonoBehaviour
     {
         [Header("Transform")] // Header for organization in Unity Inspector
-        [SerializeField] private Transform groundTransform; // Reference to ground detection transform
+        [SerializeField]
+        private Transform groundTransform; // Reference to ground detection transform
+
         [SerializeField] private Transform headTransformForLedge; // Reference to head transform for ledge detection
         [SerializeField] private Transform bodyTransformForWall; // Reference to body transform for wall detection
 
         [field: Header("Ray")] // Header for organization in Unity Inspector
         public RaycastHit2D HeadRayHit { get; private set; } // RaycastHit2D for head ray hit detection
+
         private RaycastHit2D checkRayHit; // Temporary RaycastHit2D for ray hit detection
+
 
         // Properties for move on ledge and input for ledge climb flags
         public bool HasMoveOnLedge { get; set; }
         public bool IsInputForLedgeClimb { get; set; }
-
+        private bool isLedgeParent;
+        private bool isPlatformParent;
+        private bool isDefaultParent;
         [Header("Class")] // Header for organization in Unity Inspector
-        [SerializeField] private DetectionStats detectionStats; // Reference to detection statistics
+        [SerializeField]
+        private DetectionStats detectionStats; // Reference to detection statistics
+
         [SerializeField] private CharacterComponents characterComponents; // Reference to character components
-        
+        [SerializeField] private CharacterStats stats;
+
+
         // Method called on every frame update
+        private void FixedUpdate()
+        {
+            IsWall();
+            IsOnPlatform();
+            IsGrounded(); // Checks if character is on a platform
+            
+        }
         private void Update()
         {
-            IsGrounded(); // Checks if character is grounded
-            IsWall(); // Checks if character is against a wall
             CheckForLedgeWithRay(); // Checks for ledge presence with ray
         }
 
-        // Method to check if the character is grounded
-        public bool IsGrounded()
+        private void IsGrounded()
         {
             // Checks if character's vertical velocity is close to zero and if there's an overlap circle at ground position
-            return characterComponents.Rb.velocity.y <= 0.01f && Physics2D.OverlapCircle(
+            detectionStats.IsGrounded =  characterComponents.Rb.velocity.y <= 0.01f && Physics2D.OverlapCircle(
                 groundTransform.position, 0.2f, detectionStats.Grounded);
+          
         }
-        
         // Method to check if the character is against a wall
-        public bool IsWall()
+        private void IsWall()
         {
             // Checks for wall presence with raycast based on character flip status
-            return CheckForWallWithRay() && characterComponents.Sr.flipX == false || 
+          detectionStats.IsWall =   CheckForWallWithRay() && characterComponents.Sr.flipX == false ||
                    CheckForWallWithRay() && characterComponents.Sr.flipX;
+        
         }
 
         // Method to perform wall detection with raycast
@@ -51,17 +66,49 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         {
             // Defines ray direction based on character flip status and casts ray to detect wall
             Vector2 rayDirection = bodyTransformForWall.right * (characterComponents.Sr.flipX ? -1 : 1);
-            return Physics2D.Raycast(bodyTransformForWall.position, rayDirection, 
+            return Physics2D.Raycast(bodyTransformForWall.position, rayDirection,
                 detectionStats.WallCollisionRadius, detectionStats.WallMask);
+            
         }
 
-        // Method to perform ledge detection with raycast
         private void CheckForLedgeWithRay()
         {
-            // Defines ray direction based on character flip status and casts ray to detect ledge
             Vector2 rayDirection = headTransformForLedge.right * (characterComponents.Sr.flipX ? -1 : 1);
-            HeadRayHit = Physics2D.Raycast(headTransformForLedge.position, rayDirection, 
-                detectionStats.LedgeLength, detectionStats.Grounded);
+            HeadRayHit = Physics2D.Raycast(headTransformForLedge.position, rayDirection,
+                detectionStats.LedgeLength, detectionStats.Grounded | detectionStats.Platform);
+
+            if (HeadRayHit.collider is null ||
+                (((1 << HeadRayHit.collider.gameObject.layer) & detectionStats.Platform) == 0) ||
+                (detectionStats.IsLedgeDetected || detectionStats.IsGrounded || isLedgeParent)) return;
+            characterComponents.Rb.transform.SetParent(HeadRayHit.transform);
+            isLedgeParent = true;
         }
+        
+      
+        private void IsOnPlatform()
+        {
+            detectionStats.IsOnPlatform  = characterComponents.Rb.velocity.y <= 0.01f && Physics2D.OverlapCircle(
+                groundTransform.position, 0.2f, detectionStats.Platform);
+            if (stats.MoveVector.x == 0 && detectionStats.IsOnPlatform && !stats.IsDashing)
+            {
+                var platformCollider = Physics2D.OverlapCircle(groundTransform.position, 0.2f,
+                    detectionStats.Platform);
+                if (isPlatformParent) return;
+                characterComponents.Rb.transform.SetParent(platformCollider.transform);
+                isPlatformParent = true;
+            }
+            else
+            {
+                if ((characterComponents.Rb.velocity.x == 0 && characterComponents.Rb.velocity.y == 0 &&
+                     (detectionStats.IsOnPlatform || detectionStats.IsLedgeDetected || isDefaultParent)) ||
+                    characterComponents.Rb.transform.parent is null) return;
+                characterComponents.Rb.transform.SetParent(null);
+                isDefaultParent = true;
+                isLedgeParent = false;
+                isPlatformParent = false;
+            }
+        }
+
+       
     }
 }

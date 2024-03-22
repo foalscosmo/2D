@@ -9,6 +9,7 @@ namespace Player.PlayerMovement
         // References to other components
         [SerializeField] private CharacterComponents characterComponents; // Reference to character components
         [SerializeField] private CharacterInput characterInput; // Reference to character input
+        [SerializeField] private CharacterStats characterStats;
 
         // Animator and animation states
         [Header("Character Sprite Animations")] [SerializeField]
@@ -50,6 +51,7 @@ namespace Player.PlayerMovement
         // Updates the character's sprite direction based on input
         public void UpdateSpriteDirection()
         {
+            if(characterStats.IsDashing) return;
             // Flip the sprite horizontally if moving left
             if (characterInput.MoveLeft.action.ReadValue<float>() > 0.001f)
                 characterComponents.Sr.flipX = true;

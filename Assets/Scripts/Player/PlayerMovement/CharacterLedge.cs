@@ -47,7 +47,7 @@ namespace Player.PlayerMovement
                 stats.MoveSpeed = 0; // Set movement speed to 0
                 characterDetection.HasMoveOnLedge = true; // Character has move on ledge
             }
-            yield return new WaitForSecondsRealtime(0.4f); // Wait for a short duration
+            yield return new WaitForSecondsRealtime(0.05f); // Wait for a short duration
             if (characterInput.MoveUp.action.ReadValue<float>() > 0)
             {
                 characterDetection.IsInputForLedgeClimb = true; // Input detected for ledge climb

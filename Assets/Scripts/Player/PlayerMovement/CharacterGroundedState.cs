@@ -8,23 +8,21 @@ namespace Player.PlayerMovement
     {
         public override void EnterState()
         {
-            // Resetting various flags and counters when entering the grounded state
             detectionStats.IsLedgeDetected = false;
             stats.IsJump = false;
+            detectionStats.IsClimbing = false;
             stats.IsAttacking = false;
             stats.NumberOfJumps = 0;
-            characterComponents.Rb.gravityScale = 5;
+            characterComponents.Rb.gravityScale = 4;
+          
         }
 
         public override void UpdateState()
         {
-            // Handling movement animations, dashing, rolling, and attacks
             MoveAnim();
             Dash();
             Roll();
-
-            if (characterInput.JumpAction.action.triggered && stats.IsJump)
-                JumpAnim();
+            
 
             if (characterInput.Attack.action.triggered && characterInput.MoveUp.action.ReadValue<float>() < 0.9f)
             {
@@ -39,27 +37,27 @@ namespace Player.PlayerMovement
 
         public override void FixedUpdate()
         {
-            // Moving character horizontally if not attacking
-            if (!stats.IsAttacking) characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
+            if (!stats.IsAttacking)
+            {
+                characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
+            }
+            
+            if(stats.IsDashing) characterDash.PerformDash();
+
         }
 
         public override void ExitState()
         {
-            // No exit action defined for grounded state
         }
 
         private void MoveAnim()
         {
-            // Skipping animations if dashing or attacking
             if (stats.IsDashing || stats.IsAttacking) return;
 
-            // Starting landing animation coroutine
             ctx.StartCoroutine(Land());
 
-            // Skipping if falling
             if (stats.IsFalling) return;
 
-            // Changing animation based on character's horizontal velocity
             switch (characterComponents.Rb.velocity.x)
             {
                 case > 0:
@@ -72,18 +70,10 @@ namespace Player.PlayerMovement
             }
         }
 
-        private void JumpAnim()
-        {
-            // Triggering jump animation
-            characterAnimation.ChangeAnimationState(characterAnimation.jumpAnim, 0.1f);
-        }
-
         public void PerformAttack()
         {
-            // Skipping attack if already attacking
             if (stats.IsAttacking) return;
 
-            // Performing different attacks based on the attack counter
             switch (stats.AttackCounter)
             {
                 case 0:
@@ -123,45 +113,38 @@ namespace Player.PlayerMovement
 
         private void Roll()
         {
-            // Checking conditions for rolling
             if (!(characterInput.MoveDown.action.ReadValue<float>() >= 0.8f) ||
                 !characterInput.DashAction.action.triggered ||
                 !(stats.DashCooldownTimer <= 0) || characterComponents.Rb.velocity.x == 0) return;
 
-            // Triggering dash and changing animation if dashing
             characterDash.Dash();
             if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.rollAnim, 0.1f);
-            stats.DashCooldownTimer = 0.5f;
+            stats.DashCooldownTimer = 3f;
         }
 
         private void Dash()
         {
-            // Updating dash cooldown timer
             stats.DashCooldownTimer = Mathf.Max(0f, stats.DashCooldownTimer - Time.deltaTime);
 
-            // Checking conditions for dashing
-            if (!(characterInput.MoveDown.action.ReadValue<float>() < 0.8f) ||
-                !characterInput.DashAction.action.triggered ||
-                !(stats.DashCooldownTimer <= 0) || characterComponents.Rb.velocity.x == 0) return;
-
-            // Triggering dash and changing animation if dashing
-            characterDash.Dash();
-            if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.dashAnim, 0.1f);
-            stats.DashCooldownTimer = 0.5f;
+            if (characterInput.MoveDown.action.ReadValue<float>() < 0.8f &&
+                characterInput.DashAction.action.triggered &&
+                stats.DashCooldownTimer <= 0 && !stats.IsAttacking)
+            {
+                characterDash.Dash();
+                if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.dashAnim, 0.1f);
+                stats.DashCooldownTimer = 1f;
+            }
         }
 
         private IEnumerator Land()
         {
-            // Skipping if not falling
             if (!stats.IsFalling) yield break;
 
-            // Changing animation to land animation and waiting
             characterAnimation.ChangeAnimationState(characterAnimation.landAnim, 0.1f);
             yield return new WaitForSeconds(0.1f);
             stats.IsFalling = false;
         }
 
-        // Constructor initializing the base state with necessary components
         public CharacterGroundedState(CharacterStateMachine currentContext, CharacterStateFactory characterStateFactory,
             CharacterStats characterStats, DetectionStats detectionStats, CharacterDetection characterDetection,
             CharacterComponents components, CharacterInput input, CharacterDash characterDash,

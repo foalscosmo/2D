@@ -18,6 +18,13 @@ MonoBehaviour:
   wallMask:
     serializedVersion: 2
     m_Bits: 128
+  platform:
+    serializedVersion: 2
+    m_Bits: 1024
   wallCollisionRadius: 0.3
   ledgeLength: 0.3
   isLedgeDetected: 0
+  isGrounded: 1
+  isOnPlatform: 0
+  isWall: 0
+  isClimbing: 0

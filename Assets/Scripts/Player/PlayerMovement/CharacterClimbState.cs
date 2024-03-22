@@ -1,4 +1,9 @@
 
+using System.Collections;
+using System.Diagnostics;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+
 namespace Player.PlayerMovement // Namespace for managing player movement
 {
     // Class representing the character's climb state, inheriting from CharacterBaseState
@@ -8,10 +13,13 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         public override void EnterState()
         {
             // Disables jump action, resets attacking flag, resets jump count, and sets gravity scale to 0
-            characterInput.JumpAction.action.Disable();
+          
+            detectionStats.IsClimbing = true;
             stats.IsAttacking = false;
-            stats.NumberOfJumps = 0;
             characterComponents.Rb.gravityScale = 0;
+            stats.NumberOfJumps = 0;
+           
+          
         }
 
         // Method called to update the climb state
@@ -20,14 +28,21 @@ namespace Player.PlayerMovement // Namespace for managing player movement
             // Moves character on the wall and ledge
             MoveOnWall();
             MoveOnLedge();
+            if (characterInput.JumpAction.action.triggered)
+            {
+                stats.IsJump = true;
+            }
+            
         }
 
+       
         // Method called during fixed update for physics calculations
         public override void FixedUpdate()
         {
             // Moves character vertically and horizontally based on move vector and speed
             characterMovement.MoveVertically(stats.MoveVector.y * stats.MoveSpeed);
             characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
+            characterJump.Jump();
         }
 
         // Method called when exiting the climb state
@@ -35,7 +50,20 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         {
             // Resets gravity scale and enables jump action
             characterComponents.Rb.gravityScale = 5;
-            characterInput.JumpAction.action.Enable();
+            if (characterInput.MoveLeft.action.ReadValue<float>() < 0.1f && characterComponents.Sr.flipX ||
+                characterInput.MoveRight.action.ReadValue<float>() < 0.1f && !characterComponents.Sr.flipX)
+            {
+                detectionStats.WallCollisionRadius = 0;
+            }
+            if (!stats.IsJump) detectionStats.IsClimbing = false;
+            ctx.StartCoroutine(Timer());
+        }
+
+        private IEnumerator Timer()
+        {
+            yield return new WaitForSeconds(0.3f);
+            detectionStats.WallCollisionRadius = 0.3f;
+            
         }
 
         // Method to handle movement on the wall
