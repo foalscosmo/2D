@@ -68,7 +68,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""type"": ""Button"",
                     ""id"": ""17b767ee-f031-4be2-af04-fd72b7a71038"",
                     ""expectedControlType"": ""Button"",
-                    ""processors"": """",
+                    ""processors"": ""Clamp(max=1)"",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },

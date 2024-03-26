@@ -36,6 +36,7 @@ namespace Player.PlayerMovement
                     characterStats.NumberOfJumps++;
                     characterStats.IsJump = true;
                     characterStats.EndedJumpEarly = false;
+                   Debug.Log(context.duration);
                 }
             }
 
