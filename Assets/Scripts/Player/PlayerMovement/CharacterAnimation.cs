@@ -26,6 +26,7 @@ namespace Player.PlayerMovement
         public string landAnim = "Player_Land";
         public string ledgeClimbAnim = "Player_LedgeClimb";
         public string ledgeIdleAnim = "Player_LedgeHang";
+        public string climbTurnAnim = "Player_ClimbTurn";
         public string wallIdleAnim = "Player_WallIdle";
         public string wallClimbAnim = "Player_WallClimb";
         public string groundAttack01 = "Player_Attack01";

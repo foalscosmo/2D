@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using UnityEditor.Hardware;
 using UnityEngine;
 using UnityEngine.InputSystem; // Assuming you're using the new Input System
 
@@ -29,11 +30,11 @@ namespace Player.PlayerMovement
             private void JumpActionPress(InputAction.CallbackContext context)
             {
                 // Check if the character can jump
-                if (characterStats.NumberOfJumps < characterStats.MaxJump && !detectionStats.IsClimbing && !characterStats.IsDashing)
+                if (characterStats.NumberOfJumps < characterStats.MaxJump && !characterStats.IsDashing)
                 {
                     // Increment jump count, set jump flag to true, and reset ended jump early flag
-                    characterStats.IsJump = true;
                     characterStats.NumberOfJumps++;
+                    characterStats.IsJump = true;
                     characterStats.EndedJumpEarly = false;
                 }
             }
@@ -52,38 +53,30 @@ namespace Player.PlayerMovement
                     characterComponents.Rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse);
                     characterComponents.Sr.flipX = !characterComponents.Sr.flipX;
                     detectionStats.IsClimbing = false;
-                    characterStats.NumberOfJumps++;
                 }
                 else
                 {
-                    characterComponents.Rb.velocity = new Vector2(characterComponents.Rb.velocity.x, characterStats.JumpForce);
-
+                    characterComponents.Rb.velocity = new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
                 }
                 // Reset jump flag
                 characterStats.IsJump = false;
             }
             
-
-
             // Method to apply gravity
             public void ApplyGravity()
             {
-                // Retrieve current vertical velocity
-                    var currentVelocityY = characterComponents.Rb.velocity.y;
-                    var gravity = characterStats.Gravity; // Gravity force
-                    var maxFallSpeed = characterStats.MaxFallSpeed; // Maximum fall speed
-
-                    // If the jump ended early, adjust gravity
-                    if (characterStats.EndedJumpEarly && currentVelocityY > 0)
+                // If the jump ended early, adjust gravity
+                    if (characterStats.EndedJumpEarly && characterComponents.Rb.velocity.y > 0)
                     {
-                        gravity *= characterStats.JumpEndEarlyGravityModifier;
+                        characterComponents.Rb.gravityScale *= characterStats.JumpEndEarlyGravityModifier;
+                        //Debug.Log(gravity);
                     }
-
+                
                     // If character is grounded or moving upwards, exit
-                    if (detectionStats.IsGrounded || !(currentVelocityY <= 0f)) return;
-
-                    // Apply gravity
-                    var newVelocityY = Mathf.MoveTowards(currentVelocityY, -maxFallSpeed, gravity * Time.deltaTime);
+                    if (detectionStats.IsGrounded || !(characterComponents.Rb.gravityScale <= 0f)) return;
+                
+                     var newVelocityY = Mathf.MoveTowards(characterComponents.Rb.velocity.y, 5,
+                         characterComponents.Rb.gravityScale);
                     characterComponents.Rb.velocity = new Vector2(characterComponents.Rb.velocity.x, newVelocityY);
             }
 

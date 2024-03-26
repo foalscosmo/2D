@@ -30,7 +30,7 @@ namespace Player.PlayerMovement
 
         public override void FixedUpdate()
         {
-            if (characterInput.MoveLeft.action.ReadValue<float>() > 0.1f || characterInput.MoveRight.action.ReadValue<float>() > 0.1f || stats.IsDashing)
+            if (!stats.IsDashing)
             {
                 characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
             }

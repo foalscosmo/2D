@@ -14,7 +14,6 @@ namespace Player.PlayerMovement
         [SerializeField] private int numberOfJumps; // Current number of jumps
         [SerializeField] private bool isJump; // Flag indicating whether the character is currently jumping
         [SerializeField] private float gravity; // Gravity affecting the character
-        [SerializeField] private float maxFallSpeed; // Maximum falling speed
         [SerializeField] private float jumpEndEarlyGravityModifier; // Gravity modifier for ending jump early
         public bool EndedJumpEarly { get; set; } // Flag indicating whether the jump ended early
 
@@ -76,9 +75,6 @@ namespace Player.PlayerMovement
 
         // Property for current number of jumps
         public int NumberOfJumps { get => numberOfJumps; set => numberOfJumps = value; }
-
-        // Readonly property for maximum falling speed
-        public float MaxFallSpeed => maxFallSpeed;
 
         // Readonly property for jump end early gravity modifier
         public float JumpEndEarlyGravityModifier => jumpEndEarlyGravityModifier;

@@ -41,7 +41,6 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         {
             // Moves character vertically and horizontally based on move vector and speed
             characterMovement.MoveVertically(stats.MoveVector.y * stats.MoveSpeed);
-            characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
             characterJump.Jump();
         }
 
@@ -70,20 +69,28 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         private void MoveOnWall()
         {
             // Skips if ledge is detected
-            if (detectionStats.IsLedgeDetected) return;
-
-            // Switches animation based on vertical velocity
-            switch (stats.VelocityY)
+            if (!detectionStats.IsLedgeDetected)
             {
-                case > 0:
-                case < 0:
+                if (stats.VelocityY is > 0 or < 0)
+                {
                     characterAnimation.ChangeAnimationState(characterAnimation.wallClimbAnim, 0.1f);
-                    break;
-                case 0:
-                    characterAnimation.ChangeAnimationState(characterAnimation.wallIdleAnim, 0.1f);
-                    break;
+                }
+                else if (stats.VelocityY == 0)
+                {
+                    if (stats.MoveVector.x == 0)
+                    {
+                        characterAnimation.ChangeAnimationState(characterAnimation.wallIdleAnim, 0.1f);
+                    }
+                    else
+                    {
+                        characterAnimation.ChangeAnimationState(characterAnimation.ledgeIdleAnim, 0.1f);
+                    }
+                }
             }
         }
+        
+
+
 
         // Method to handle movement on the ledge
         private void MoveOnLedge()

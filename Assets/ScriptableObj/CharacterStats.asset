@@ -16,11 +16,10 @@ MonoBehaviour:
   maxJump: 2
   numberOfJumps: 0
   isJump: 0
-  gravity: 5
-  maxFallSpeed: 0
-  jumpEndEarlyGravityModifier: 0
+  gravity: 0
+  jumpEndEarlyGravityModifier: 0.99
   dashDuration: 0.2
-  dashTimer: 0.009089664
+  dashTimer: 0.013049319
   isFalling: 0
   moveVector: {x: 0, y: 0}
   isDashing: 0
@@ -29,5 +28,5 @@ MonoBehaviour:
   dashSpeed: 15
   moveSpeed: 5
   isAttacking: 0
-  attackCounter: 2
+  attackCounter: 0
   airAttackCounter: 0
