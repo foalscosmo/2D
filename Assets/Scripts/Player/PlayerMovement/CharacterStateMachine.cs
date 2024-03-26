@@ -94,5 +94,10 @@ namespace Player.PlayerMovement
         {
             Debug.Log("1");
         }
+
+        private void Git2()
+        {
+            Debug.Log("2");
+        }
     }
 }
