@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Player.PlayerMovement // Namespace for managing player movement
@@ -11,11 +12,17 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         [SerializeField] private CharacterComponents characterComponents;
         private bool canDash = true; // Flag to indicate if character can dash
 
+        private void Update()
+        {
+            characterStats.DashCooldownTimer = Mathf.Max(0f, characterStats.DashCooldownTimer - Time.deltaTime);
+
+        }
+
         // Method to trigger a dash action
         public void Dash()
         {
             // Initiates dash only if character can dash
-            if (canDash) StartCoroutine(DashTimer());
+            if (canDash && !characterStats.IsAttacking) StartCoroutine(DashTimer());
         }
 
         // Coroutine to handle dash duration

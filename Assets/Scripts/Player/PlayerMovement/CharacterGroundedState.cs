@@ -11,6 +11,7 @@ namespace Player.PlayerMovement
             detectionStats.IsLedgeDetected = false;
             stats.IsJump = false;
             detectionStats.IsClimbing = false;
+            stats.IsDashing = false;
             stats.IsAttacking = false;
             stats.NumberOfJumps = 0;
             characterComponents.Rb.gravityScale = 4;
@@ -62,52 +63,54 @@ namespace Player.PlayerMovement
             {
                 case > 0:
                 case < 0:
-                    characterAnimation.ChangeAnimationState(characterAnimation.runAnim, 0.1f);
+                    characterAnimation.ChangeAnimationState(characterAnimation.runAnim, 0f);
                     break;
                 case 0:
-                    characterAnimation.ChangeAnimationState(characterAnimation.idleAnim, 0.1f);
+                    characterAnimation.ChangeAnimationState(characterAnimation.idleAnim, 0f);
                     break;
             }
         }
 
         public void PerformAttack()
         {
-            if (stats.IsAttacking) return;
+            if (stats.IsDashing) return;
 
-            switch (stats.AttackCounter)
+            if (stats.AttackCounter == 0 && !stats.IsAttacking && !detectionStats.IsWall)
             {
-                case 0:
-                    characterComponents.Rb.velocity = Vector2.zero;
-                    stats.IsAttacking = true;
-                    characterAnimation.ChangeAnimationState(characterAnimation.groundAttack01, 0f);
-                    stats.AttackCounter++;
-                    break;
-                case 1:
-                    characterComponents.Rb.velocity = Vector2.zero;
-                    characterAnimation.ChangeAnimationState(characterAnimation.groundAttack03, 0f);
-                    stats.IsAttacking = true;
-                    stats.AttackCounter++;
-                    break;
-                case 2:
-                    characterComponents.Rb.velocity = Vector2.zero;
-                    var randomValue = Random.Range(0f, 1f);
-                    characterAnimation.ChangeAnimationState(
-                        randomValue < 0.5f ? characterAnimation.punch01Anim : characterAnimation.kick01Anim, 0f);
-                    stats.IsAttacking = true;
-                    stats.AttackCounter++;
-                    break;
-                case 3:
-                    characterComponents.Rb.velocity = Vector2.zero;
-                    characterAnimation.ChangeAnimationState(characterAnimation.groundAttack04, 0f);
-                    stats.IsAttacking = true;
-                    stats.AttackCounter = 0;
-                    break;
-                case 4:
-                    characterComponents.Rb.velocity = Vector2.zero;
-                    characterAnimation.ChangeAnimationState(characterAnimation.groundUpAttack, 0f);
-                    stats.IsAttacking = true;
-                    stats.AttackCounter = 0;
-                    break;
+                characterComponents.Rb.velocity = Vector2.zero;
+                stats.IsAttacking = true;
+                characterAnimation.ChangeAnimationState(characterAnimation.groundAttack01, 0.2f);
+                stats.AttackCounter++;
+            }
+            else if (stats.AttackCounter == 1 && !stats.IsAttacking && !detectionStats.IsWall)
+            {
+                characterComponents.Rb.velocity = Vector2.zero;
+                characterAnimation.ChangeAnimationState(characterAnimation.groundAttack03, 0.2f);
+                stats.IsAttacking = true;
+                stats.AttackCounter++;
+            }
+            else if (stats.AttackCounter == 2 && !stats.IsAttacking && !detectionStats.IsWall)
+            {
+                characterComponents.Rb.velocity = Vector2.zero;
+                var randomValue = Random.Range(0f, 1f);
+                characterAnimation.ChangeAnimationState(
+                    randomValue < 0.5f ? characterAnimation.punch01Anim : characterAnimation.kick01Anim, 0.2f);
+                stats.IsAttacking = true;
+                stats.AttackCounter++;
+            }
+            else if (stats.AttackCounter == 3 && !stats.IsAttacking && !detectionStats.IsWall)
+            {
+                characterComponents.Rb.velocity = Vector2.zero;
+                characterAnimation.ChangeAnimationState(characterAnimation.groundAttack04, 0.2f);
+                stats.IsAttacking = true;
+                stats.AttackCounter = 0;
+            }
+            else if (stats.AttackCounter == 4 && !stats.IsAttacking && !detectionStats.IsWall)
+            {
+                characterComponents.Rb.velocity = Vector2.zero;
+                characterAnimation.ChangeAnimationState(characterAnimation.groundUpAttack, 0.2f);
+                stats.IsAttacking = true;
+                stats.AttackCounter = 0;
             }
         }
 
@@ -118,20 +121,18 @@ namespace Player.PlayerMovement
                 !(stats.DashCooldownTimer <= 0) || characterComponents.Rb.velocity.x == 0) return;
 
             characterDash.Dash();
-            if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.rollAnim, 0.1f);
-            stats.DashCooldownTimer = 3f;
+            if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.rollAnim, 0f);
+            stats.DashCooldownTimer = 1f;
         }
 
         private void Dash()
         {
-            stats.DashCooldownTimer = Mathf.Max(0f, stats.DashCooldownTimer - Time.deltaTime);
-
             if (characterInput.MoveDown.action.ReadValue<float>() < 0.8f &&
                 characterInput.DashAction.action.triggered &&
                 stats.DashCooldownTimer <= 0 && !stats.IsAttacking)
             {
                 characterDash.Dash();
-                if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.dashAnim, 0.1f);
+                if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.dashAnim, 0f);
                 stats.DashCooldownTimer = 1f;
             }
         }
@@ -140,7 +141,7 @@ namespace Player.PlayerMovement
         {
             if (!stats.IsFalling) yield break;
 
-            characterAnimation.ChangeAnimationState(characterAnimation.landAnim, 0.1f);
+            characterAnimation.ChangeAnimationState(characterAnimation.landAnim, 0f);
             yield return new WaitForSeconds(0.1f);
             stats.IsFalling = false;
         }

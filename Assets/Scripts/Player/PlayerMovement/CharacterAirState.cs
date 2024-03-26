@@ -14,6 +14,7 @@ namespace Player.PlayerMovement
         // Called when entering the air state
         public override void EnterState()
         {
+            Debug.Log(characterDetection.GroundRayHit.distance);
         }
         
         public override void UpdateState()
@@ -30,7 +31,7 @@ namespace Player.PlayerMovement
 
         public override void FixedUpdate()
         {
-            if (!stats.IsDashing)
+            if (!stats.IsDashing && !stats.IsAttacking)
             {
                 characterMovement.MoveHorizontally(stats.MoveVector.x * stats.MoveSpeed);
             }
@@ -65,15 +66,14 @@ namespace Player.PlayerMovement
         {
             if (!stats.IsDashing && !stats.IsAttacking)
             {
-                characterAnimation.ChangeAnimationState(characterAnimation.jumpAnim, 0.1f);
+                characterAnimation.ChangeAnimationState(characterAnimation.jumpAnim, 0f);
             }
         }
 
         private void AirDashAnimation()
         {
-            stats.DashCooldownTimer = Mathf.Max(0f, stats.DashCooldownTimer - Time.deltaTime);
 
-            if (characterInput.DashAction.action.triggered && stats.DashCooldownTimer <= 0)
+            if (characterInput.DashAction.action.triggered && stats.DashCooldownTimer <= 0 && !stats.IsAttacking)
             {
                 stats.IsDashing = true;
                 characterAnimation.ChangeAnimationState(characterAnimation.dashAnim,0f);
@@ -83,7 +83,7 @@ namespace Player.PlayerMovement
         
         public void PerformAttack()
         {
-            if(stats.AirAttackCounter > 1) return;
+            if(stats.AirAttackCounter >= 1) return;
             characterComponents.Rb.velocity = new Vector2(0, 5); 
             characterAnimation.ChangeAnimationState(characterAnimation.kickAnim, 0f);
             stats.IsAttacking = true;

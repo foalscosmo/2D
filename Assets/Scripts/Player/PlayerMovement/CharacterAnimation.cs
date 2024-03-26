@@ -52,7 +52,7 @@ namespace Player.PlayerMovement
         // Updates the character's sprite direction based on input
         public void UpdateSpriteDirection()
         {
-            if(characterStats.IsDashing) return;
+            if(characterStats.IsDashing || characterStats.IsAttacking) return;
             // Flip the sprite horizontally if moving left
             if (characterInput.MoveLeft.action.ReadValue<float>() > 0.001f)
                 characterComponents.Sr.flipX = true;

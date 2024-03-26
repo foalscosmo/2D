@@ -13,17 +13,13 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         [SerializeField] private Transform bodyTransformForWall; // Reference to body transform for wall detection
 
         public Vector2 RayDirection { get; set; }
-        public Transform Test
-        {
-            get => bodyTransformForWall;
-            set => bodyTransformForWall = value;
-        }
 
         [field: Header("Ray")] // Header for organization in Unity Inspector
         public RaycastHit2D HeadRayHit { get; private set; } // RaycastHit2D for head ray hit detection
 
         private RaycastHit2D checkRayHit; // Temporary RaycastHit2D for ray hit detection
 
+        public RaycastHit2D GroundRayHit { get; private set; }
 
         // Properties for move on ledge and input for ledge climb flags
         public bool HasMoveOnLedge { get; set; }
@@ -50,6 +46,7 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         private void Update()
         {
             CheckForLedgeWithRay(); // Checks for ledge presence with ray
+            CheckGroundDistance();
         }
 
         private void IsGrounded()
@@ -57,7 +54,6 @@ namespace Player.PlayerMovement // Namespace for managing player movement
             // Checks if character's vertical velocity is close to zero and if there's an overlap circle at ground position
             detectionStats.IsGrounded =  characterComponents.Rb.velocity.y <= 0.01f && Physics2D.OverlapCircle(
                 groundTransform.position, 0.2f, detectionStats.Grounded);
-          
         }
        
         private void IsWall()
@@ -77,8 +73,13 @@ namespace Player.PlayerMovement // Namespace for managing player movement
                 detectionStats.WallCollisionRadius, detectionStats.WallMask);
             
         }
-      
 
+        public void CheckGroundDistance()
+        {
+            Vector2 rayDirection = -headTransformForLedge.up;
+            GroundRayHit = Physics2D.Raycast(groundTransform.position, rayDirection, 9999,detectionStats.Grounded);
+
+        }
 
         private void CheckForLedgeWithRay()
         {
