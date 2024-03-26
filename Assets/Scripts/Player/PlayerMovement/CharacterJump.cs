@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using UnityEditor.Hardware;
+﻿using System;
 using UnityEngine;
-using UnityEngine.InputSystem; // Assuming you're using the new Input System
+using UnityEngine.InputSystem;
+
 
 namespace Player.PlayerMovement
 {
@@ -12,7 +12,8 @@ namespace Player.PlayerMovement
             [SerializeField] private CharacterDetection characterDetection; // Reference to character's detection
             [SerializeField] private CharacterInput input; // Reference to character's input
             [SerializeField] private DetectionStats detectionStats;
-           
+            private const float Tolerance = 0.0001f; // Adjust as needed
+
 
             private void OnEnable()
             {
@@ -25,7 +26,7 @@ namespace Player.PlayerMovement
                 // Unsubscribe from jump action when disabled
                 input.JumpAction.action.started -= JumpActionPress;
             }
-
+            
             // Method triggered when jump action is performed
             private void JumpActionPress(InputAction.CallbackContext context)
             {
@@ -36,29 +37,46 @@ namespace Player.PlayerMovement
                     characterStats.NumberOfJumps++;
                     characterStats.IsJump = true;
                     characterStats.EndedJumpEarly = false;
-                   Debug.Log(context.duration);
                 }
             }
 
-            // Method to execute the jump
+          
+
+            // Method to execute the jumpS
             public void Jump()
             {
                 // Check if the character can jump
                 if (!characterStats.IsJump) return;
 
-                // Apply vertical velocity for jump
-                if (detectionStats.IsClimbing && characterStats.MoveVector.x == 0)
+                switch (detectionStats.IsClimbing)
                 {
-                    float forceY = characterComponents.Rb.velocity.y < 5 ? 13 : 8;
-                    float forceX = characterComponents.Sr.flipX ? 5 : -5;
-                    characterComponents.Rb.AddForce(new Vector2(forceX, forceY), ForceMode2D.Impulse);
-                    characterComponents.Sr.flipX = !characterComponents.Sr.flipX;
-                    detectionStats.IsClimbing = false;
+                    case true:
+                    {
+                        if ((Math.Abs(characterDetection.RayDirection.x - (-1)) < Tolerance &&
+                             Math.Abs(input.MoveRight.action.ReadValue<float>() - 1f) < Tolerance) ||
+                            (Math.Abs(characterDetection.RayDirection.x - 1) < Tolerance &&
+                             Math.Abs(input.MoveLeft.action.ReadValue<float>() - 1f) < Tolerance))
+                        {
+                            characterComponents.Rb.velocity =
+                                new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
+                        }
+                        else
+                        {
+                            characterComponents.Rb.AddForce(new Vector2(0, -5), ForceMode2D.Impulse);
+                            characterComponents.Sr.flipX = !characterComponents.Sr.flipX;
+                            detectionStats.IsClimbing = false;
+                            characterStats.NumberOfJumps++;
+                        }
+
+                        detectionStats.IsClimbing = false;
+                        break;
+                    }
+                    default:
+                        characterComponents.Rb.velocity =
+                            new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
+                        break;
                 }
-                else
-                {
-                    characterComponents.Rb.velocity = new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
-                }
+                
                 // Reset jump flag
                 characterStats.IsJump = false;
             }

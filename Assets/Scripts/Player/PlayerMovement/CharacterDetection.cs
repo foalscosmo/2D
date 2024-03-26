@@ -12,6 +12,13 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         [SerializeField] private Transform headTransformForLedge; // Reference to head transform for ledge detection
         [SerializeField] private Transform bodyTransformForWall; // Reference to body transform for wall detection
 
+        public Vector2 RayDirection { get; set; }
+        public Transform Test
+        {
+            get => bodyTransformForWall;
+            set => bodyTransformForWall = value;
+        }
+
         [field: Header("Ray")] // Header for organization in Unity Inspector
         public RaycastHit2D HeadRayHit { get; private set; } // RaycastHit2D for head ray hit detection
 
@@ -52,7 +59,7 @@ namespace Player.PlayerMovement // Namespace for managing player movement
                 groundTransform.position, 0.2f, detectionStats.Grounded);
           
         }
-        // Method to check if the character is against a wall
+       
         private void IsWall()
         {
             // Checks for wall presence with raycast based on character flip status
@@ -60,16 +67,18 @@ namespace Player.PlayerMovement // Namespace for managing player movement
                    CheckForWallWithRay() && characterComponents.Sr.flipX;
         
         }
-
+        
         // Method to perform wall detection with raycast
         private bool CheckForWallWithRay()
         {
             // Defines ray direction based on character flip status and casts ray to detect wall
-            Vector2 rayDirection = bodyTransformForWall.right * (characterComponents.Sr.flipX ? -1 : 1);
-            return Physics2D.Raycast(bodyTransformForWall.position, rayDirection,
+           RayDirection = bodyTransformForWall.right * (characterComponents.Sr.flipX ? -1 : 1);
+            return Physics2D.Raycast(bodyTransformForWall.position, RayDirection,
                 detectionStats.WallCollisionRadius, detectionStats.WallMask);
             
         }
+      
+
 
         private void CheckForLedgeWithRay()
         {

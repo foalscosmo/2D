@@ -89,15 +89,6 @@ namespace Player.PlayerMovement
         {
             data.playerPos = transform.position;
         }
-
-        private void Git()
-        {
-            Debug.Log("1");
-        }
-
-        private void Git2()
-        {
-            Debug.Log("2");
-        }
+        
     }
 }

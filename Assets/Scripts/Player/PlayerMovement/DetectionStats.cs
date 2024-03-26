@@ -66,5 +66,6 @@ namespace Player.PlayerMovement
             set => isLedgeDetected = value;
         }
         public float LedgeLength => ledgeLength;               // Property for accessing ledge length
+       
     }
 }
