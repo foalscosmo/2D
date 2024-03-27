@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,10 +14,11 @@ namespace Player.PlayerMovement
             [SerializeField] private CharacterInput input; // Reference to character's input
             [SerializeField] private DetectionStats detectionStats;
             private const float Tolerance = 0.0001f; // Adjust as needed
-
-
+            
             private bool isPressed;
             private float pressStartTime;
+            private bool isLongJump;
+            private float jumpPressedTime;
             private void OnEnable()
             {
                 // Subscribe to jump action when enabled
@@ -40,29 +42,21 @@ namespace Player.PlayerMovement
                 if (characterStats.NumberOfJumps < characterStats.MaxJump && !characterStats.IsDashing)
                 {
                     pressStartTime = Time.time;
-                    isPressed = true;
                     characterStats.NumberOfJumps++;
                     characterStats.IsJump = true;
                     characterStats.EndedJumpEarly = false;
                 }
             }
-            
-            private void Update()
-            {
-                if (!isPressed || characterStats.NumberOfJumps != 1) return;
-                var pressDuration = Time.time - pressStartTime;
 
-                switch (pressDuration)
-                {
-                    case > 0.08f and < 0.2f:
-                        characterComponents.Rb.velocity = new Vector2(characterStats.MoveVector.x, 7);
-                        break;
-                    case >= 0.2f:
-                        isPressed = false;
-                        break;
-                }
+            private void FixedUpdate()
+            {
+                if (!isPressed) return;
+                jumpPressedTime = Time.time - pressStartTime;
+                if (jumpPressedTime <= 0.15f) characterComponents.Rb.velocity = 
+                    new Vector2(characterComponents.Rb.velocity.x, characterStats.JumpForce);
             }
-            
+
+
             private void OnButtonCancel(InputAction.CallbackContext context)
             {
                 isPressed = false;
@@ -85,6 +79,7 @@ namespace Player.PlayerMovement
                         {
                             characterComponents.Rb.velocity =
                                 new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
+
                         }
                         else
                         {
@@ -98,8 +93,7 @@ namespace Player.PlayerMovement
                         break;
                     }
                     default:
-                        characterComponents.Rb.velocity =
-                            new Vector2(characterStats.MoveVector.x, characterStats.JumpForce);
+                        isPressed = true;
                         break;
                 }
                 

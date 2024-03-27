@@ -44,6 +44,7 @@ namespace Player.PlayerMovement
         public override void ExitState()
         { 
             stats.AirAttackCounter = 0;
+            stats.IsFalling = true;
         }
 
         private void JumpAnimations()

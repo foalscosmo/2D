@@ -10,6 +10,7 @@ namespace Player.PlayerMovement
         // Character Jump Parameters
         [Header("Character Jump")] 
         [SerializeField] private float jumpForce; // Force applied when jumping
+        [SerializeField] private float megaJumpForce; // Force applied when jumping
         [SerializeField] private int maxJump; // Maximum number of jumps allowed
         [SerializeField] private int numberOfJumps; // Current number of jumps
         [SerializeField] private bool isJump; // Flag indicating whether the character is currently jumping
@@ -69,6 +70,8 @@ namespace Player.PlayerMovement
 
         // Property for jump force
         public float JumpForce { get => jumpForce; set => jumpForce = value; }
+        public float MegaJumpForce { get => megaJumpForce; set => megaJumpForce = value; }
+
 
         // Property for maximum number of jumps
         public int MaxJump { get => maxJump; set => maxJump = value; }
