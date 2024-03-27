@@ -15,16 +15,22 @@ namespace Player.PlayerMovement
             private const float Tolerance = 0.0001f; // Adjust as needed
 
 
+            private bool isPressed;
+            private float pressStartTime;
             private void OnEnable()
             {
                 // Subscribe to jump action when enabled
                 input.JumpAction.action.started += JumpActionPress;
+                input.JumpAction.action.canceled += OnButtonCancel;
+
             }
 
             private void OnDisable()
             {
                 // Unsubscribe from jump action when disabled
                 input.JumpAction.action.started -= JumpActionPress;
+                input.JumpAction.action.canceled -= OnButtonCancel;
+
             }
             
             // Method triggered when jump action is performed
@@ -33,15 +39,35 @@ namespace Player.PlayerMovement
                 // Check if the character can jump
                 if (characterStats.NumberOfJumps < characterStats.MaxJump && !characterStats.IsDashing)
                 {
-                    // Increment jump count, set jump flag to true, and reset ended jump early flag
+                    pressStartTime = Time.time;
+                    isPressed = true;
                     characterStats.NumberOfJumps++;
                     characterStats.IsJump = true;
                     characterStats.EndedJumpEarly = false;
                 }
             }
+            
+            private void Update()
+            {
+                if (!isPressed || characterStats.NumberOfJumps != 1) return;
+                var pressDuration = Time.time - pressStartTime;
 
-          
-
+                switch (pressDuration)
+                {
+                    case > 0.08f and < 0.2f:
+                        characterComponents.Rb.velocity = new Vector2(characterStats.MoveVector.x, 7);
+                        break;
+                    case >= 0.2f:
+                        isPressed = false;
+                        break;
+                }
+            }
+            
+            private void OnButtonCancel(InputAction.CallbackContext context)
+            {
+                isPressed = false;
+            }
+            
             // Method to execute the jumpS
             public void Jump()
             {

@@ -14,7 +14,6 @@ namespace Player.PlayerMovement
         // Called when entering the air state
         public override void EnterState()
         {
-            Debug.Log(characterDetection.GroundRayHit.distance);
         }
         
         public override void UpdateState()
