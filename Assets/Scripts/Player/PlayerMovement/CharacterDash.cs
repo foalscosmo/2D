@@ -50,7 +50,7 @@ namespace Player.PlayerMovement // Namespace for managing player movement
 
         public void PerformDash()
         {
-            if (characterStats.IsAttacking) return;
+            if (characterStats.IsAttacking || detectionStats.IsWall) return;
             // If dashing, move character with dash speed and direction
             var dashSpeed = characterStats.DashSpeed;
             var dashDirection = characterComponents.Sr.flipX ? -1f : 1f;

@@ -10,7 +10,7 @@ namespace Managers
         [SerializeField] private Toggle vSyncToggle; // Toggle for enabling/disabling VSync
         [SerializeField] private Button vSyncButton; // Button for toggling VSync
 
-        private const int FrameRateLimit = 60; // Frame rate limit
+        private const int FrameRateLimit = 90; // Frame rate limit
 
         // Called when the object becomes enabled and active
         private void Awake()

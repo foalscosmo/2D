@@ -129,7 +129,7 @@ namespace Player.PlayerMovement
         {
             if (characterInput.MoveDown.action.ReadValue<float>() < 0.8f &&
                 characterInput.DashAction.action.triggered &&
-                stats.DashCooldownTimer <= 0 && !stats.IsAttacking)
+                stats.DashCooldownTimer <= 0 && !stats.IsAttacking && !detectionStats.IsWall)
             {
                 characterDash.Dash();
                 if (stats.IsDashing) characterAnimation.ChangeAnimationState(characterAnimation.dashAnim, 0f);

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bea602b121144ebc8b1fa06d601f6720, type: 3}
   m_Name: CharacterStats
   m_EditorClassIdentifier: 
-  jumpForce: 7
+  jumpForce: 8
   megaJumpForce: 10
   maxJump: 2
   numberOfJumps: 0
@@ -20,12 +20,12 @@ MonoBehaviour:
   gravity: 0
   jumpEndEarlyGravityModifier: 1
   dashDuration: 0.2
-  dashTimer: 0.01386185
+  dashTimer: 0.009288028
   isFalling: 0
   moveVector: {x: 0, y: 0}
   isDashing: 0
   dashCooldownTimer: 0
-  smoothTime: 0.03
+  smoothTime: 2
   dashSpeed: 15
   moveSpeed: 5
   isAttacking: 0

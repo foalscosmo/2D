@@ -1,5 +1,4 @@
 ﻿using System;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,7 +23,6 @@ namespace Player.PlayerMovement
                 // Subscribe to jump action when enabled
                 input.JumpAction.action.started += JumpActionPress;
                 input.JumpAction.action.canceled += OnButtonCancel;
-
             }
 
             private void OnDisable()
@@ -39,7 +37,7 @@ namespace Player.PlayerMovement
             private void JumpActionPress(InputAction.CallbackContext context)
             {
                 // Check if the character can jump
-                if (characterStats.NumberOfJumps < characterStats.MaxJump && !characterStats.IsDashing)
+                if (characterStats.NumberOfJumps < characterStats.MaxJump && !characterStats.IsDashing && !characterStats.IsAttacking)
                 {
                     pressStartTime = Time.time;
                     characterStats.NumberOfJumps++;
