@@ -46,7 +46,7 @@ namespace Player.PlayerMovement
         public void MoveVertically(float verticalSpeed)
         {
             characterStats.VelocityY = Mathf.MoveTowards(characterComponents.Rb.velocity.y, verticalSpeed,
-                characterStats.SmoothTime);
+                2);
             characterComponents.Rb.velocity = new Vector2(characterComponents.Rb.velocity.x, characterStats.VelocityY);
         }
         

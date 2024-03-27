@@ -20,12 +20,12 @@ MonoBehaviour:
   gravity: 0
   jumpEndEarlyGravityModifier: 1
   dashDuration: 0.2
-  dashTimer: 0.003161624
+  dashTimer: 0.01386185
   isFalling: 0
   moveVector: {x: 0, y: 0}
   isDashing: 0
   dashCooldownTimer: 0
-  smoothTime: 2
+  smoothTime: 0.03
   dashSpeed: 15
   moveSpeed: 5
   isAttacking: 0
