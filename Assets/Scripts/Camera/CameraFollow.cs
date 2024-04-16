@@ -1,3 +1,5 @@
+using Cinemachine;
+using Player.PlayerMovement;
 using Save_Load;
 using UnityEngine;
 
@@ -8,27 +10,33 @@ namespace Camera
     public class CameraFollow : MonoBehaviour, IDataPersistence
     {
         // Reference to the target object to follow
-        public Transform target;
-
-        // Smoothing factor for camera movement
-        public float smoothSpeed = 0.125f;
-
-        // Update is called once per frame
+        [SerializeField] private Transform target;
+        [SerializeField] private CharacterComponents characterComponents;
+        [SerializeField] private float smoothSpeed = 0.125f;
+        private Vector3 desiredPosition, currentPosition, targetPosition, smoothedPosition;
+        
         private void Update()
         {
-            // Check if target is null, if so, exit early
             if (target is null) return;
 
-            // Calculate the desired position for the camera
-            var position = target.position;
-            var currentPosition = transform.position;
-            var desiredPosition = new Vector3(position.x, position.y, currentPosition.z);
-            
-            // Smoothly move the camera towards the desired position
-            var smoothedPosition = Vector3.Lerp(currentPosition, desiredPosition, smoothSpeed);
+            switch (characterComponents.Sr.flipX)
+            {
+                case false:
+                    targetPosition = target.position;
+                    currentPosition = transform.position;
+                    desiredPosition = new Vector3(targetPosition.x + 0.5f, targetPosition.y + 1, currentPosition.z);
+                    break;
+                default:
+                    targetPosition = target.position;
+                    currentPosition = transform.position;
+                    desiredPosition = new Vector3(targetPosition.x - 0.5f, targetPosition.y + 1, currentPosition.z);
+                    break;
+            }
+
+            smoothedPosition = Vector3.Lerp(currentPosition, desiredPosition, smoothSpeed);
             transform.position = smoothedPosition;
         }
-
+        
         // Method to load camera data from a saved game state
         public void LoadData(GameData data)
         {
