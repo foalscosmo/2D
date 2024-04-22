@@ -45,6 +45,7 @@ namespace Managers
                     startPanel.SetActive(true);
                     optionsPanel.SetActive(false);
                     loadPanel.SetActive(false);
+                    eventSystem.SetSelectedGameObject(startGameButton);
                     break;
                 case > 0: // If it's not the start menu scene
                     startPanel.SetActive(false);

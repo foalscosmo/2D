@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Managers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,6 +14,7 @@ namespace Panel
         [SerializeField] private int activeIndex = -1; // Index of the currently active option panel
         [SerializeField] private List<Button> optionButtons = new List<Button>(); // List of buttons corresponding to option panels
         [SerializeField] private int number; // Number of valid option panels
+        [SerializeField] private SceneIndex sceneIndex;
 
         // Property to access the active index
         public int ActiveIndex
@@ -40,7 +43,13 @@ namespace Panel
                 eventTrigger.triggers.Add(entry);
             }
         }
-   
+
+        private void OnEnable()
+        {
+            if(sceneIndex.Index < 1) return;
+            SwitchOptionPanels(0);
+        }
+
         // Switches between option panels based on the selected button index
         private void SwitchOptionPanels(int index)
         {

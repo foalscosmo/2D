@@ -17,14 +17,14 @@ namespace Panel
         private void OnEnable()
         {
             // Subscribe to the "Back" action performed event
-            playerInput.actions["Back"].performed += CloseSubPanel;
+            if (playerInput != null) playerInput.actions["Back"].performed += CloseSubPanel;
         }
 
         // Called when the object becomes disabled or inactive
         private void OnDisable()
         {
             // Unsubscribe from the "Back" action performed event
-            playerInput.actions["Back"].performed -= CloseSubPanel;
+            if (playerInput != null) playerInput.actions["Back"].performed -= CloseSubPanel;
         }
 
         // Closes the secondary panel when the "Back" action is triggered

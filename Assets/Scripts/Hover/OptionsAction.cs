@@ -15,21 +15,16 @@ namespace Hover
         [SerializeField] private PlayerInput characterInput; // Player input actions
         [SerializeField] private EventSystem eventSystem; // Reference to the Event System
         [SerializeField] private OptionButtonHover optionButtonHover; // Script handling hover for buttons
-        [SerializeField] private List<Button> mainOptionButton = new List<Button>(); // List of main option buttons
-        [SerializeField] private List<Button> sliderButtons = new List<Button>(); // List of slider buttons
-        [SerializeField] private List<Slider> sliders = new List<Slider>(); // List of sliders
-        [SerializeField] private List<OptionButtonHover> optionButtonHovers = new List<OptionButtonHover>(); // List of scripts handling hover for buttons
-        [SerializeField] private List<OptionButtonUnHover> optionButtonUnHovers = new List<OptionButtonUnHover>(); // List of scripts handling unhover for buttons
-        [SerializeField] private List<GameObject> mainPanels; // List of main panels
+        [SerializeField] private List<Button> mainOptionButton = new(); // List of main option buttons
+        [SerializeField] private List<Button> sliderButtons = new(); // List of slider buttons
+        [SerializeField] private List<Slider> sliders = new(); // List of sliders
+        [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of scripts handling hover for buttons
 
         // Called when the GameObject becomes enabled and active
         private void OnEnable()
         {
             // Subscribe to the Back action performed event
             characterInput.actions["Back"].performed += DeselectWithAction;
-            // Subscribe to the OnResetHover event for each OptionButtonUnHover script
-            foreach (var unHoverObj in optionButtonUnHovers)
-                unHoverObj.OnResetHover += SetHoverIndexValue;
         }
 
         // Called when the GameObject becomes disabled or inactive
@@ -37,9 +32,6 @@ namespace Hover
         {
             // Unsubscribe from the Back action performed event
             characterInput.actions["Back"].performed -= DeselectWithAction;
-            // Unsubscribe from the OnResetHover event for each OptionButtonUnHover script
-            foreach (var unHoverObj in optionButtonUnHovers)
-                unHoverObj.OnResetHover -= SetHoverIndexValue;
         }
 
         // Method to handle deselection when the Back action is performed
@@ -71,18 +63,7 @@ namespace Hover
                     break;
             }
         }
-
-        // Method to set the hover index value based on the active panel
-        private void SetHoverIndexValue()
-        {
-            // Iterate through the list of OptionButtonUnHover scripts
-            for (var i = 0; i < optionButtonUnHovers.Count; i++)
-            {
-                // If the main panel at index i is active, start a coroutine to delay selection change
-                if (mainPanels[i].activeSelf) StartCoroutine(Timer());
-            }
-        }
-
+        
         // Coroutine to reset hover indexes after a delay
         private IEnumerator Timer()
         {
