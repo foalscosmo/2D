@@ -15,7 +15,6 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         private void Update()
         {
             characterStats.DashCooldownTimer = Mathf.Max(0f, characterStats.DashCooldownTimer - Time.deltaTime);
-
         }
 
         // Method to trigger a dash action

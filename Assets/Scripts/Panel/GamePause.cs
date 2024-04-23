@@ -109,6 +109,7 @@ namespace Panel
             pauseCondition.isOptionPressed = true;
             eventSystem.gameObject.SetActive(false);
             audioListener.gameObject.SetActive(false);
+            playerInput.enabled = false;
             SceneManager.LoadScene("StartMenu", LoadSceneMode.Additive);
         }
         
@@ -119,6 +120,7 @@ namespace Panel
             pauseCondition.isOptionPressed = false;
             eventSystem.gameObject.SetActive(true);
             audioListener.SetActive(true);
+            playerInput.enabled = true;
         }
 
         // Called when the application is quitting

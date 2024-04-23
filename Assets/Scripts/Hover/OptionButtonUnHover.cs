@@ -15,19 +15,10 @@ namespace Hover
 
         private void Update()
         {
-            if (eventSystem.currentSelectedGameObject == mainButton && !isSelected)
-            {
-                isSelected = true;
-                
-                if (isSelected)
-                {
-                    foreach (var childButtons in buttons)
-                    {
-                        childButtons.targetGraphic.color = Color.grey;
-                        Debug.Log("here");
-                    }
-                }
-            }
+            if (eventSystem.currentSelectedGameObject != mainButton || isSelected) return;
+            isSelected = true;
+            if (!isSelected) return;
+            foreach (var childButtons in buttons) childButtons.targetGraphic.color = Color.grey;
         }
 
         public void ReturnHoverToParentButton()

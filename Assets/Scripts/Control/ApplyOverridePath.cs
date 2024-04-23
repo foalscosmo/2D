@@ -20,15 +20,6 @@ namespace Control
         // Awake is called when the script instance is being loaded
         private void Awake()
         {
-            // Loop through controller inputs and apply binding overrides
-            for (var i = 0; i < inputOverridePath.ControllerInputs.Count; i++)
-            {
-                characterInput.actions.actionMaps[0].actions[i].ApplyBindingOverride(
-                    1, // Controller index
-                    new InputBinding { overridePath = inputOverridePath.ControllerInputs[i] }
-                );
-            }
-            
             // Apply inputs immediately
             ApplyInputs();
         }
@@ -56,6 +47,14 @@ namespace Control
                 characterInput.actions.actionMaps[0].actions[i].ApplyBindingOverride(
                     0, // Keyboard index
                     new InputBinding { overridePath = inputOverridePath.KeyboardInputs[i] }
+                );
+            }
+            
+            for (var i = 0; i < inputOverridePath.ControllerInputs.Count; i++)
+            {
+                characterInput.actions.actionMaps[0].actions[i].ApplyBindingOverride(
+                    1, // Controller index
+                    new InputBinding { overridePath = inputOverridePath.ControllerInputs[i] }
                 );
             }
         }
