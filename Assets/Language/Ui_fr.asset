@@ -150,6 +150,18 @@ MonoBehaviour:
     m_Localized: Retour au Menu
     m_Metadata:
       m_Items: []
+  - m_Id: 50713352287019008
+    m_Localized: Retour au jeu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723670266470400
+    m_Localized: Oui
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723684258668544
+    m_Localized: Non
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

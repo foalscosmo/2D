@@ -19,6 +19,8 @@ namespace Hover
         [SerializeField] private List<Button> sliderButtons = new(); // List of slider buttons
         [SerializeField] private List<Slider> sliders = new(); // List of sliders
         [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of scripts handling hover for buttons
+        [SerializeField] private GameObject questionPanel;
+        [SerializeField] private GameObject optionsPanel;
 
         // Called when the GameObject becomes enabled and active
         private void OnEnable()
@@ -39,7 +41,6 @@ namespace Hover
         {
             // If sub panels are active, return
             if (panelCondition.IsActiveSubPanels) return;
-            
             // If the currently selected GameObject is a slider or its associated button, change their color
             if (eventSystem.currentSelectedGameObject == sliderButtons[0].gameObject
                 || eventSystem.currentSelectedGameObject == sliderButtons[1].gameObject ||
@@ -51,6 +52,7 @@ namespace Hover
             }
 
             // Depending on the active index of optionButtonHover, perform different actions
+            if (questionPanel.activeSelf || !optionsPanel.activeSelf) return;
             switch (optionButtonHover.ActiveIndex)
             {
                 case 0:

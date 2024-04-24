@@ -13,8 +13,7 @@ namespace Managers
         [SerializeField] private GraphicsIndex graphicsIndex; // The selected graphics index
         [SerializeField] private SoundValue soundValue; // The volume level
         [SerializeField] private BrightnessValue brightnessValue; // The brightness level
-        [SerializeField] private MenuPanelManager menuPanelManager; // The menu panel manager reference
-        [SerializeField] private Button backButton; // The back button reference
+        [SerializeField] private Button saveButton; // The back button reference
 
         // Called when the object becomes enabled and active
         private void Awake()
@@ -22,21 +21,7 @@ namespace Managers
             // Load settings when the game starts
             LoadSettings();
             // Listen to the back button click event to save settings
-            backButton.onClick.AddListener(SaveSettings);
-        }
-
-        // Called when the object becomes enabled and active
-        private void OnEnable()
-        {
-            // Subscribe to the escape action event of the menu panel manager
-            menuPanelManager.OnEscapeAction += SaveSettings;
-        }
-
-        // Called when the behaviour becomes disabled
-        private void OnDisable()
-        {
-            // Unsubscribe from the escape action event of the menu panel manager
-            menuPanelManager.OnEscapeAction -= SaveSettings;
+            saveButton.onClick.AddListener(SaveSettings);
         }
 
         // Saves the current game settings to PlayerPrefs

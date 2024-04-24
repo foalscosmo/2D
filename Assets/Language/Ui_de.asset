@@ -150,6 +150,18 @@ MonoBehaviour:
     m_Localized: "Zur\xFCck zum Men\xFC"
     m_Metadata:
       m_Items: []
+  - m_Id: 50713352287019008
+    m_Localized: "Zur\xFCck zum Spiel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723670266470400
+    m_Localized: Ja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723684258668544
+    m_Localized: Nein
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

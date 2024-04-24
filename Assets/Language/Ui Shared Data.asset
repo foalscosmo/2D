@@ -147,6 +147,18 @@ MonoBehaviour:
     m_Key: Back To Menu
     m_Metadata:
       m_Items: []
+  - m_Id: 50713352287019008
+    m_Key: Back To Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723670266470400
+    m_Key: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 50723684258668544
+    m_Key: No
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

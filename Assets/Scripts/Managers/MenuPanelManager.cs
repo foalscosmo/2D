@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Hover;
 using Save_Load;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -24,21 +24,29 @@ namespace Managers
         [SerializeField] private GameObject loadPanel; // Panel for load game menu
         [SerializeField] private Button loadButton; // Button to load a game
 
+        [SerializeField] private GameObject backQuestionPanel;
+        [SerializeField] private Button answerButtonYes;
+        [SerializeField] private Button answerButtonNo;
+        [SerializeField] private List<TextMeshProUGUI> questionText = new();
+        [SerializeField] private TextMeshProUGUI currentQuestion;
         [SerializeField] private EventSystem eventSystem; // Event system for UI navigation
         [SerializeField] private PlayerInput playerInput; // Player input reference
         [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of option button hovers
         [SerializeField] private List<GameObject> mainPanels; // List of main panels
-        public event Action OnEscapeAction; // Event triggered on escape action
 
         [SerializeField] private SceneIndex sceneIndex; // Index of the current scene
         [SerializeField] private GameIndex gameIndex; // Index of the current game
         [SerializeField] private PauseCondition pauseCondition; // Pause condition reference
-        [SerializeField] private GameObject backButton; // Button to go back
+        [SerializeField] private Button backButton; // Button to go back
 
+        private GameObject lastSelected;
         // Awake method called before Start
         private void Awake()
         {
             // Switch to determine initial panel based on scene index
+            answerButtonYes.onClick.AddListener(BackToAction);
+            answerButtonNo.onClick.AddListener(DisableQuestionPanel);
+            backButton.onClick.AddListener(EnableQuestionPanel);
             switch (sceneIndex.Index)
             {
                 case 0: // If it's the start menu scene
@@ -58,31 +66,60 @@ namespace Managers
         // Method called when the script instance is enabled
         private void OnEnable()
         {
-            // Subscribe to back action event
             if (playerInput != null) playerInput.actions["Back"].performed += BackWithAction;
         }
-
+        
         // Method called when the script instance is disabled
         private void OnDisable()
         {
-            // Unsubscribe from back action event
             if (playerInput != null) playerInput.actions["Back"].performed -= BackWithAction;
         }
-
+        
         // Method to handle back action
         private void BackWithAction(InputAction.CallbackContext context)
         {
             // Check if any option button hover is active or back button is selected
-            for (var i = 0; i < optionButtonHovers.Count; i++)
+            if (!backQuestionPanel.activeSelf && optionsPanel.activeSelf)
             {
-                if (optionButtonHovers[i].ActiveIndex == -1 && mainPanels[i].activeSelf 
-                    || eventSystem.currentSelectedGameObject == backButton)
+                for (var i = 0; i < optionButtonHovers.Count; i++)
                 {
-                    // Invoke escape action event and switch to default panel
-                    OnEscapeAction?.Invoke();
-                    SwitchPanels(0);
+                    if (optionButtonHovers[i].ActiveIndex == -1 && mainPanels[i].activeSelf 
+                        || eventSystem.currentSelectedGameObject == backButton.gameObject)
+                    {
+                        var obj = eventSystem.currentSelectedGameObject;
+                        lastSelected = obj;
+                        EnableQuestionPanel();
+                    }
                 }
             }
+            else if(optionsPanel.activeSelf)
+            {
+                DisableQuestionPanel();
+            }
+        }
+
+        private void BackToAction()
+        {
+            backQuestionPanel.SetActive(false);
+            SwitchPanels(0);
+        }
+
+        private void DisableQuestionPanel()
+        {
+            backQuestionPanel.SetActive(false);
+            eventSystem.SetSelectedGameObject(lastSelected.gameObject);
+        }
+
+        private void EnableQuestionPanel()
+        {
+            currentQuestion.text = sceneIndex.Index switch
+            {
+                0 => questionText[sceneIndex.Index].text,
+                > 0 => questionText[sceneIndex.Index].text,
+                _ => currentQuestion.text
+            };
+            backQuestionPanel.SetActive(true);
+            eventSystem.SetSelectedGameObject(answerButtonYes.gameObject);
         }
 
         // Method to switch between panels
