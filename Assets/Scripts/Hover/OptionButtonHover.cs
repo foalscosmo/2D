@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -52,7 +53,9 @@ namespace Hover
         {
             // Reset the color of the previously active button to grey if there was one
             if (activeIndex != -1)
+            {
                 optionButton[activeIndex].targetGraphic.color = Color.grey;
+            }
             
             // Update the active index to the newly selected button
             activeIndex = index;

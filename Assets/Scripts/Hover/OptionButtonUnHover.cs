@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,7 +19,10 @@ namespace Hover
             if (eventSystem.currentSelectedGameObject != mainButton || isSelected) return;
             isSelected = true;
             if (!isSelected) return;
-            foreach (var childButtons in buttons) childButtons.targetGraphic.color = Color.grey;
+            foreach (var childButtons in buttons)
+            {
+                childButtons.targetGraphic.color = Color.grey;
+            }
         }
 
         public void ReturnHoverToParentButton()

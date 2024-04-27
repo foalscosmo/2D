@@ -15,6 +15,7 @@ namespace Managers
     public class MenuPanelManager : MonoBehaviour
     {
         // Serialized fields for Unity inspector
+        [SerializeField] private EventSystem eventSystem; // Event system for UI navigation
         [SerializeField] private GameObject startPanel; // Panel for start menu
         [SerializeField] private GameObject startGameButton; // Button to start the game
 
@@ -29,11 +30,10 @@ namespace Managers
         [SerializeField] private Button answerButtonNo;
         [SerializeField] private List<TextMeshProUGUI> questionText = new();
         [SerializeField] private TextMeshProUGUI currentQuestion;
-        [SerializeField] private EventSystem eventSystem; // Event system for UI navigation
+
         [SerializeField] private PlayerInput playerInput; // Player input reference
         [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of option button hovers
         [SerializeField] private List<GameObject> mainPanels; // List of main panels
-
         [SerializeField] private SceneIndex sceneIndex; // Index of the current scene
         [SerializeField] private GameIndex gameIndex; // Index of the current game
         [SerializeField] private PauseCondition pauseCondition; // Pause condition reference
@@ -83,7 +83,7 @@ namespace Managers
             {
                 for (var i = 0; i < optionButtonHovers.Count; i++)
                 {
-                    if (optionButtonHovers[i].ActiveIndex == -1 && mainPanels[i].activeSelf 
+                    if ((optionButtonHovers[i].ActiveIndex == -1 && mainPanels[i].activeSelf)
                         || eventSystem.currentSelectedGameObject == backButton.gameObject)
                     {
                         var obj = eventSystem.currentSelectedGameObject;
@@ -106,8 +106,8 @@ namespace Managers
 
         private void DisableQuestionPanel()
         {
-            backQuestionPanel.SetActive(false);
             eventSystem.SetSelectedGameObject(lastSelected.gameObject);
+            backQuestionPanel.SetActive(false);
         }
 
         private void EnableQuestionPanel()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Managers;
 using TMPro;
@@ -11,23 +12,20 @@ namespace Graphics
     public class SetGraphics : MonoBehaviour
     {
         // List of buttons to select different graphics settings
-        [SerializeField] private List<Button> graphicsButtons = new List<Button>();
-
+        [SerializeField] private List<Button> graphicsButtons = new();
         // TextMeshProUGUI component to display quality level
         [SerializeField] private TextMeshProUGUI qualityText;
-
+        [SerializeField] private List<TextMeshProUGUI> qualityTexts = new();
         // Reference to the GraphicsManager for managing graphics settings
         [SerializeField] private GraphicsManager graphicsManager;
+
+        private bool canTextChange;
 
         // Awake is called when the script instance is being loaded
         private void Awake()
         {
-            // Set the initial quality level
-            QualitySettings.SetQualityLevel(graphicsManager.Index.Index);
-
             // Update the displayed quality level text
-            qualityText.text = graphicsManager.Index.Index.ToString();
-
+            SetQualityText();
             // Add listeners to the graphics buttons
             for (var i = 0; i < graphicsButtons.Count; i++)
             {
@@ -37,6 +35,13 @@ namespace Graphics
                 // Add a listener to each button to set the graphics quality
                 graphicsButtons[i].onClick.AddListener(() => SetGraphicsQuality(number));
             }
+        }
+
+        private void OnEnable()
+        {
+            if (!canTextChange) return;
+            SetQualityText();
+            canTextChange = false;
         }
 
         // Method to set the graphics quality
@@ -49,7 +54,17 @@ namespace Graphics
             QualitySettings.SetQualityLevel(number);
 
             // Update the displayed quality level text
-            qualityText.text = graphicsManager.Index.Index.ToString();
+            SetQualityText();
+        }
+
+        private void SetQualityText() 
+        {
+            qualityText.text = qualityTexts[graphicsManager.Index.Index].text;
+        }
+
+        public void ChangeTextCondition()
+        {
+            canTextChange = true;
         }
     }
 }

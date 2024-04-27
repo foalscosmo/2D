@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Panel;
 using UnityEngine;
@@ -21,6 +22,26 @@ namespace Hover
         [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of scripts handling hover for buttons
         [SerializeField] private GameObject questionPanel;
         [SerializeField] private GameObject optionsPanel;
+
+        private void Awake()
+        {
+            foreach (var button in mainOptionButton)
+            {
+                // Add an EventTrigger component to the button if not already present
+                var eventTrigger = button.gameObject.GetComponent<EventTrigger>() 
+                                   ?? button.gameObject.AddComponent<EventTrigger>();
+
+                // Create a new event entry for the Select event
+                var entry = new EventTrigger.Entry
+                {
+                    eventID = EventTriggerType.Select
+                };
+
+                // Add a listener to the Select event to handle button properties
+                entry.callback.AddListener((_) => SetMainButtonsActiveIndex());
+                eventTrigger.triggers.Add(entry);
+            }
+        }
 
         // Called when the GameObject becomes enabled and active
         private void OnEnable()
@@ -73,6 +94,11 @@ namespace Hover
             yield return new WaitForSecondsRealtime(0.05f); 
             // Reset the active index for all OptionButtonHover scripts
             foreach (var t in optionButtonHovers) t.ActiveIndex = -1;
+        }
+
+        private void SetMainButtonsActiveIndex()
+        {
+            StartCoroutine(Timer());
         }
     }
 }
