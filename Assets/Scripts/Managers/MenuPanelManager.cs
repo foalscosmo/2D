@@ -1,6 +1,9 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Hover;
 using Save_Load;
+using Sound;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -16,49 +19,50 @@ namespace Managers
     {
         // Serialized fields for Unity inspector
         [SerializeField] private EventSystem eventSystem; // Event system for UI navigation
-        [SerializeField] private GameObject startPanel; // Panel for start menu
-        [SerializeField] private GameObject startGameButton; // Button to start the game
+        [SerializeField] private Button answerButtonYes;
 
-        [SerializeField] private GameObject optionsPanel; // Panel for options menu
-        [SerializeField] private GameObject settingButton; // Button to access settings
-
-        [SerializeField] private GameObject loadPanel; // Panel for load game menu
-        [SerializeField] private Button loadButton; // Button to load a game
+        [SerializeField] private List<Button> firstButtonsOfMainPanels = new();
+        [SerializeField] private List<GameObject> panels = new();
 
         [SerializeField] private GameObject backQuestionPanel;
-        [SerializeField] private Button answerButtonYes;
         [SerializeField] private Button answerButtonNo;
         [SerializeField] private List<TextMeshProUGUI> questionText = new();
         [SerializeField] private TextMeshProUGUI currentQuestion;
 
         [SerializeField] private PlayerInput playerInput; // Player input reference
         [SerializeField] private List<OptionButtonHover> optionButtonHovers = new(); // List of option button hovers
-        [SerializeField] private List<GameObject> mainPanels; // List of main panels
+        [SerializeField] private List<GameObject> innerOptionPanels; // List of main panels
         [SerializeField] private SceneIndex sceneIndex; // Index of the current scene
         [SerializeField] private GameIndex gameIndex; // Index of the current game
         [SerializeField] private PauseCondition pauseCondition; // Pause condition reference
         [SerializeField] private Button backButton; // Button to go back
-
         private GameObject lastSelected;
-        // Awake method called before Start
+
+        [SerializeField] private List<Color> imageColors = new();
+        [SerializeField] private List<Image> image = new();
+        [SerializeField] private PanelTransitionSound panelTransitionSound;
+        private bool transitioning = false;
+        private float transitionStartTime;
+        private int transitionIndex;
+        
+        private const float Duration = 0.4f;
         private void Awake()
         {
-            // Switch to determine initial panel based on scene index
             answerButtonYes.onClick.AddListener(BackToAction);
             answerButtonNo.onClick.AddListener(DisableQuestionPanel);
             backButton.onClick.AddListener(EnableQuestionPanel);
             switch (sceneIndex.Index)
             {
-                case 0: // If it's the start menu scene
-                    startPanel.SetActive(true);
-                    optionsPanel.SetActive(false);
-                    loadPanel.SetActive(false);
-                    eventSystem.SetSelectedGameObject(startGameButton);
+                case 0: 
+                    panels[0].SetActive(true);
+                    panels[1].SetActive(false);
+                    panels[2].SetActive(false);
+                    eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[0].gameObject);
                     break;
-                case > 0: // If it's not the start menu scene
-                    startPanel.SetActive(false);
-                    optionsPanel.SetActive(true);
-                    loadPanel.SetActive(false);
+                case > 0: 
+                    panels[0].SetActive(false);
+                    panels[1].SetActive(true);
+                    panels[2].SetActive(false);
                     break;
             }
         }
@@ -75,15 +79,35 @@ namespace Managers
             if (playerInput != null) playerInput.actions["Back"].performed -= BackWithAction;
         }
         
-        // Method to handle back action
+        private void Update()
+        {
+            if (transitioning)
+            {
+                float elapsedTime = Time.time - transitionStartTime;
+                Color startColor = image[transitionIndex].color;
+                Color targetColor = imageColors[1];
+                float t = elapsedTime / Duration;
+        
+                image[transitionIndex].color = Color.Lerp(startColor, targetColor, t);
+        
+                if (t >= 1f)
+                {
+                    transitioning = false;
+                    image[transitionIndex].color = targetColor;
+                    panels[transitionIndex].SetActive(false);
+                }
+            }
+        }
+
+        
         private void BackWithAction(InputAction.CallbackContext context)
         {
             // Check if any option button hover is active or back button is selected
-            if (!backQuestionPanel.activeSelf && optionsPanel.activeSelf)
+            if (!backQuestionPanel.activeSelf && panels[1].activeSelf)
             {
                 for (var i = 0; i < optionButtonHovers.Count; i++)
                 {
-                    if ((optionButtonHovers[i].ActiveIndex == -1 && mainPanels[i].activeSelf)
+                    if ((optionButtonHovers[i].ActiveIndex == -1 && innerOptionPanels[i].activeSelf)
                         || eventSystem.currentSelectedGameObject == backButton.gameObject)
                     {
                         var obj = eventSystem.currentSelectedGameObject;
@@ -92,7 +116,7 @@ namespace Managers
                     }
                 }
             }
-            else if(optionsPanel.activeSelf)
+            else if(panels[1].activeSelf)
             {
                 DisableQuestionPanel();
             }
@@ -102,6 +126,62 @@ namespace Managers
         {
             backQuestionPanel.SetActive(false);
             SwitchPanels(0);
+        }
+
+        // Method to switch between panels
+
+        public void SwitchPanels(int index)
+        {
+            for (var i = 0; i < panels.Count; i++)
+            {
+                if (panels[i].activeSelf)
+                {
+                    //panels[i].SetActive(false);
+                    panelTransitionSound.PanelSound();
+                    StartCoroutine(TransitionAlpha(i));
+                }
+            }
+
+            if (sceneIndex.Index == 0)
+            {
+                // panels[index].SetActive(true);
+                // eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[index].gameObject);
+
+                StartCoroutine(StartDelay(index));
+            }
+            else if (sceneIndex.Index > 0) // If it's not the start menu scene
+            {
+                pauseCondition.isOptionPressed = false; // Reset option press flag
+                ReturnToGame(); // Return to the game scene
+            }
+        }
+
+
+        private IEnumerator TransitionAlpha(int index)
+        {
+            float elapsedTime = 0f;
+            Color startColor = image[index].color;
+            Color targetColor = imageColors[1];
+        
+            while (elapsedTime < Duration)
+            {
+                float t = elapsedTime / Duration;
+                image[index].color = Color.Lerp(startColor, targetColor, t);
+        
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+        
+            panels[index].SetActive(false);
+            image[index].color = targetColor;
+        }
+
+        private IEnumerator StartDelay(int index)
+        {
+            yield return new WaitForSecondsRealtime(0.4f);
+            image[index].color = imageColors[0];
+            panels[index].SetActive(true);
+            eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[index].gameObject);
         }
 
         private void DisableQuestionPanel()
@@ -122,59 +202,11 @@ namespace Managers
             eventSystem.SetSelectedGameObject(answerButtonYes.gameObject);
         }
 
-        // Method to switch between panels
-        public void SwitchPanels(int index)
-        {
-            // Deactivate all panels
-            if (startPanel.activeSelf)
-                startPanel.SetActive(false);
-            if (optionsPanel.activeSelf)
-                optionsPanel.SetActive(false);
-            if (loadPanel.activeSelf)
-                loadPanel.SetActive(false);
-            
-            // Check scene index to determine panel behavior
-            if (sceneIndex.Index == 0) // If it's the start menu scene
-            {
-                switch (index)
-                {
-                    case 0: // Start panel
-                        startPanel.SetActive(true);
-                        eventSystem.SetSelectedGameObject(startGameButton);
-                        break;
-                    case 1: // Load panel
-                        loadPanel.SetActive(true);
-                        eventSystem.SetSelectedGameObject(loadButton.gameObject);
-                        break;
-                    case 2: // Options panel
-                        optionsPanel.SetActive(true);
-                        eventSystem.SetSelectedGameObject(settingButton);
-                        break;
-                }
-            }
-            else if (sceneIndex.Index > 0) // If it's not the start menu scene
-            {
-                pauseCondition.isOptionPressed = false; // Reset option press flag
-                ReturnToGame(); // Return to the game scene
-            }
-        }
 
-        // Method to start a new game with selected index
-        public void StartNewGame(int index)
-        {
-            gameIndex.Index = index; // Set game index
-        }
+        public void StartNewGame(int index) => gameIndex.Index = index;
 
-        // Method to load a game with selected index
-        public void LoadGameWithButtonIndex(int index)
-        {
-            gameIndex.Index = index; // Set game index
-        }
+        public void LoadGameWithButtonIndex(int index) => gameIndex.Index = index;
 
-        // Method to return to the game scene
-        private void ReturnToGame()
-        {
-            SceneManager.UnloadSceneAsync("StartMenu"); // Unload the start menu scene
-        }
+        private void ReturnToGame() => SceneManager.UnloadSceneAsync("StartMenu");
     }
 }

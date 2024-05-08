@@ -8,20 +8,22 @@ namespace Hover
     {
         [SerializeField] private EventSystem eventSystem;
         private GameObject lastSelectedObj;
+        private readonly Vector3 defaultSize = new(2.0f, 2.0f, 1f);
+        private readonly Vector3 hoverSize = new(2.1f, 2.1f, 1f);
         private bool hasChanged;
 
         private void Start()
         {
             lastSelectedObj = eventSystem.currentSelectedGameObject;
-            lastSelectedObj.transform.DOScale(2.1f, 0.3f);
+            lastSelectedObj.transform.localScale = hoverSize;
         }
 
         private void Update()
         {
             if (eventSystem.currentSelectedGameObject == lastSelectedObj) return;
-            lastSelectedObj.transform.DOScale(2f, 0.3f);
+            lastSelectedObj.transform.localScale = defaultSize;
             lastSelectedObj = eventSystem.currentSelectedGameObject;
-            lastSelectedObj.transform.DOScale(2.1f, 0.3f);
+            lastSelectedObj.transform.localScale = hoverSize;
         }
     }
 }
