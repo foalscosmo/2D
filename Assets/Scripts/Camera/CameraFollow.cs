@@ -11,7 +11,7 @@ namespace Camera
     {
         // Reference to the target object to follow
         [SerializeField] private Transform target;
-        [SerializeField] private CharacterComponents characterComponents;
+       // [SerializeField] private CharacterComponents characterComponents;
         [SerializeField] private float smoothSpeed = 0.125f;
         private Vector3 desiredPosition, currentPosition, targetPosition, smoothedPosition;
         
@@ -19,20 +19,23 @@ namespace Camera
         {
             if (target is null) return;
 
-            switch (characterComponents.Sr.flipX)
-            {
-                case false:
-                    targetPosition = target.position;
-                    currentPosition = transform.position;
-                    desiredPosition = new Vector3(targetPosition.x + 0.5f, targetPosition.y + 1, currentPosition.z);
-                    break;
-                default:
-                    targetPosition = target.position;
-                    currentPosition = transform.position;
-                    desiredPosition = new Vector3(targetPosition.x - 0.5f, targetPosition.y + 1, currentPosition.z);
-                    break;
-            }
-
+            // switch (characterComponents.Sr.flipX)
+            // {
+            //     case false:
+            //         targetPosition = target.position;
+            //         currentPosition = transform.position;
+            //         desiredPosition = new Vector3(targetPosition.x + 0.5f, targetPosition.y + 1, currentPosition.z);
+            //         break;
+            //     default:
+            //         targetPosition = target.position;
+            //         currentPosition = transform.position;
+            //         desiredPosition = new Vector3(targetPosition.x - 0.5f, targetPosition.y + 1, currentPosition.z);
+            //         break;
+            // }
+            
+            targetPosition = target.position;
+            currentPosition = transform.position;
+            desiredPosition = new Vector3(targetPosition.x + 0.5f, targetPosition.y + 1, currentPosition.z);
             smoothedPosition = Vector3.Lerp(currentPosition, desiredPosition, smoothSpeed);
             transform.position = smoothedPosition;
         }
