@@ -118,7 +118,5 @@ namespace Player.PlayerMovement // Namespace for managing player movement
                 isPlatformParent = false;
             }
         }
-
-       
     }
 }

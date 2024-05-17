@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Platform;
-using UnityEngine;
+﻿using UnityEngine;
 
 // Namespace for managing player movement
 namespace Player.PlayerMovement

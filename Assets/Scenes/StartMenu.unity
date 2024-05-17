@@ -25110,10 +25110,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 24eaeae153b524bb6a55fdcc7ee3c735, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 303d44c8d6ec943a38df8ec10b19d9c7, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 0.9
+  m_Pitch: 0.25
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -28483,13 +28483,6 @@ MonoBehaviour:
   gameIndex: {fileID: 598075596534829886, guid: c67e3dba965cf4bc1b746f910857c553, type: 3}
   pauseCondition: {fileID: 139801204922716437, guid: 7db129928f9cc425db4d439b4aa926a7, type: 3}
   backButton: {fileID: 1659725346}
-  imageColors:
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 1, g: 1, b: 1, a: 0}
-  image:
-  - {fileID: 1813518918}
-  - {fileID: 13416741}
-  - {fileID: 224880713}
   panelTransitionSound: {fileID: 2127882818}
 --- !u!222 &6755353972797844424
 CanvasRenderer:

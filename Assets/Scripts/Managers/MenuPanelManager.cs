@@ -1,6 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Hover;
 using Save_Load;
 using Sound;
@@ -37,15 +36,7 @@ namespace Managers
         [SerializeField] private PauseCondition pauseCondition; // Pause condition reference
         [SerializeField] private Button backButton; // Button to go back
         private GameObject lastSelected;
-
-        [SerializeField] private List<Color> imageColors = new();
-        [SerializeField] private List<Image> image = new();
         [SerializeField] private PanelTransitionSound panelTransitionSound;
-        private bool transitioning = false;
-        private float transitionStartTime;
-        private int transitionIndex;
-        
-        private const float Duration = 0.4f;
         private void Awake()
         {
             answerButtonYes.onClick.AddListener(BackToAction);
@@ -67,42 +58,18 @@ namespace Managers
             }
         }
 
-        // Method called when the script instance is enabled
         private void OnEnable()
         {
             if (playerInput != null) playerInput.actions["Back"].performed += BackWithAction;
         }
         
-        // Method called when the script instance is disabled
         private void OnDisable()
         {
             if (playerInput != null) playerInput.actions["Back"].performed -= BackWithAction;
         }
-        
-        private void Update()
-        {
-            if (transitioning)
-            {
-                float elapsedTime = Time.time - transitionStartTime;
-                Color startColor = image[transitionIndex].color;
-                Color targetColor = imageColors[1];
-                float t = elapsedTime / Duration;
-        
-                image[transitionIndex].color = Color.Lerp(startColor, targetColor, t);
-        
-                if (t >= 1f)
-                {
-                    transitioning = false;
-                    image[transitionIndex].color = targetColor;
-                    panels[transitionIndex].SetActive(false);
-                }
-            }
-        }
 
-        
         private void BackWithAction(InputAction.CallbackContext context)
         {
-            // Check if any option button hover is active or back button is selected
             if (!backQuestionPanel.activeSelf && panels[1].activeSelf)
             {
                 for (var i = 0; i < optionButtonHovers.Count; i++)
@@ -127,61 +94,26 @@ namespace Managers
             backQuestionPanel.SetActive(false);
             SwitchPanels(0);
         }
-
-        // Method to switch between panels
-
+        
         public void SwitchPanels(int index)
         {
-            for (var i = 0; i < panels.Count; i++)
+            foreach (var t in panels.Where(t => t.activeSelf))
             {
-                if (panels[i].activeSelf)
-                {
-                    //panels[i].SetActive(false);
-                    panelTransitionSound.PanelSound();
-                    StartCoroutine(TransitionAlpha(i));
-                }
+                t.SetActive(false);
+                panelTransitionSound.PanelSound();
             }
 
-            if (sceneIndex.Index == 0)
+            switch (sceneIndex.Index)
             {
-                // panels[index].SetActive(true);
-                // eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[index].gameObject);
-
-                StartCoroutine(StartDelay(index));
+                case 0:
+                    panels[index].SetActive(true);
+                    eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[index].gameObject);
+                    break;
+                case > 0:
+                    pauseCondition.isOptionPressed = false; 
+                    ReturnToGame();
+                    break;
             }
-            else if (sceneIndex.Index > 0) // If it's not the start menu scene
-            {
-                pauseCondition.isOptionPressed = false; // Reset option press flag
-                ReturnToGame(); // Return to the game scene
-            }
-        }
-
-
-        private IEnumerator TransitionAlpha(int index)
-        {
-            float elapsedTime = 0f;
-            Color startColor = image[index].color;
-            Color targetColor = imageColors[1];
-        
-            while (elapsedTime < Duration)
-            {
-                float t = elapsedTime / Duration;
-                image[index].color = Color.Lerp(startColor, targetColor, t);
-        
-                elapsedTime += Time.deltaTime;
-                yield return null;
-            }
-        
-            panels[index].SetActive(false);
-            image[index].color = targetColor;
-        }
-
-        private IEnumerator StartDelay(int index)
-        {
-            yield return new WaitForSecondsRealtime(0.4f);
-            image[index].color = imageColors[0];
-            panels[index].SetActive(true);
-            eventSystem.SetSelectedGameObject(firstButtonsOfMainPanels[index].gameObject);
         }
 
         private void DisableQuestionPanel()
