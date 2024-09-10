@@ -4,22 +4,29 @@ using UnityEngine;
 
 namespace Character.CharacterScripts
 {
+    internal enum MoveState
+    {
+        None,
+        MovingLeft,
+        MovingRight
+    }
     public class BotMovement : MonoBehaviour
     {
         [SerializeField] private BotComponents botComponents;
         [SerializeField] private BotStats botStats;
         [SerializeField] private BotInput botInput;
+        private MoveState lastMoveState = MoveState.MovingRight;
 
         private void Update()
         {
+            
             HandleBotInput();
         }
 
         private void FixedUpdate()
         {
             MoveHorizontally(botStats.MoveSpeed);
-            RotateBot();
-
+            UpdateMoveState();
         }
 
         private void HandleBotInput()
@@ -45,43 +52,33 @@ namespace Character.CharacterScripts
                     new Vector2(0, botComponents.Rb.velocity.y);
             }
         }
+        
 
-        private void RotateBot()
+        private void UpdateMoveState()
         {
-            // if (botStats.MoveDirection != botStats.PreviousMoveDirection)
-            // {
-            //     botStats.PreviousMoveDirection = botStats.MoveDirection;
-            //
-            //     switch (botStats.MoveDirection.x)
-            //     {
-            //         case 1:
-            //             transform.rotation = Quaternion.Euler(0, 90, 0);
-            //             break;
-            //         case -1:
-            //             transform.rotation = Quaternion.Euler(0, -90, 0);
-            //             break;
-            //     }
-            // }
-            
-            Vector3 currentMoveDirection = botStats.MoveDirection.normalized;
-
-            if (currentMoveDirection != botStats.PreviousMoveDirection)
+            if (botStats.MoveDirection.x > 0)
             {
-                botStats.PreviousMoveDirection = currentMoveDirection;
-
-                if (currentMoveDirection.x > 0)
+                if (lastMoveState != MoveState.MovingRight)
                 {
-                    transform.rotation = Quaternion.Euler(0, 90, 0);
+                    RotateBot(90);
                     botStats.IsRotating = true;
-
-                }
-                else if (currentMoveDirection.x < 0)
-                {
-                    transform.rotation = Quaternion.Euler(0, -90, 0);
-                    botStats.IsRotating = true;
-
+                    lastMoveState = MoveState.MovingRight;
                 }
             }
+            else if (botStats.MoveDirection.x < 0)
+            {
+                if (lastMoveState != MoveState.MovingLeft)
+                {
+                    RotateBot(-90);
+                    botStats.IsRotating = true;
+                    lastMoveState = MoveState.MovingLeft;
+                }
+            }
+        }
+        
+        private void RotateBot(float angle)
+        {
+            transform.rotation = Quaternion.Euler(0, angle, 0);
         }
 
         private void RunToStop() => botStats.IsRunning = false;
