@@ -13,6 +13,7 @@ namespace Player.PlayerMovement
             [SerializeField] private CharacterInput input; // Reference to character's input
             [SerializeField] private DetectionStats detectionStats;
             private const float Tolerance = 0.0001f; // Adjust as needed
+            [SerializeField] private PlayerSounds playerSounds;
             
             private bool isPressed;
             private float pressStartTime;
@@ -42,6 +43,7 @@ namespace Player.PlayerMovement
                     pressStartTime = Time.time;
                     characterStats.NumberOfJumps++;
                     characterStats.IsJump = true;
+                    playerSounds.JumpSound();
                     characterStats.EndedJumpEarly = false;
                 }
             }

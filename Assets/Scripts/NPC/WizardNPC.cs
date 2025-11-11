@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Coins;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NPC
 {
@@ -15,8 +17,12 @@ namespace NPC
         [SerializeField] private TextMeshProUGUI textObj;
         [SerializeField] private int missionCoinAmount;
         [SerializeField] private int detectionAmount;
+        [SerializeField] private float messageDelay = 2f;
         
         private TypewriterEffect typewriterEffect;
+        private bool hasGivenFirstWarning = false;
+        private Coroutine messageSequenceCoroutine;
+        [SerializeField] private PlayerInput characterInput;
 
         private void Start()
         {
@@ -25,6 +31,8 @@ namespace NPC
             {
                 typewriterEffect = textObj.gameObject.AddComponent<TypewriterEffect>();
             }
+            
+            characterInput.enabled = false;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -46,21 +54,52 @@ namespace NPC
 
         private void CheckPlayerCoin()
         {
-            string message = "";
-            
             if (coin.Amount >= missionCoinAmount && detectionAmount > 1)
             {
-                message = "HaHaHa... Just Kidding there is no new chapter";
+                ShowMessage("HaHaHa... Just Kidding there is no new chapter, have fun");
             }
             else if (coin.Amount < missionCoinAmount && detectionAmount > 1)
             {
-                message = "It's not enough bring me more";
+                ShowMessage("It's not enough bring me all gems");
             }
             else if (coin.Amount < missionCoinAmount && detectionAmount == 1)
             {
-                message = $"Hello there, I am your master, bring me {missionCoinAmount} gem to unlock new chapter";
+                if (!hasGivenFirstWarning)
+                {
+                    // Show both messages in sequence
+                    messageSequenceCoroutine = StartCoroutine(ShowFirstMeetingMessages());
+                    hasGivenFirstWarning = true;
+                }
+                else
+                {
+                    ShowMessage("But I warn you, you have a difficult road ahead of you, so be careful.");
+                }
             }
+        }
 
+        private IEnumerator ShowFirstMeetingMessages()
+        {
+            textBox.SetActive(true);
+            
+            var firstMessage = $"Hello there, I am your master, bring me {missionCoinAmount} gem to unlock new chapter";
+            typewriterEffect.StartTyping(firstMessage);
+            
+            yield return new WaitForSeconds(typewriterEffect.GetTypingDuration(firstMessage) + messageDelay);
+            
+            var secondMessage = "But I warn you, you have a difficult road ahead of you, so be careful.";
+            typewriterEffect.StartTyping(secondMessage);
+            
+            yield return new WaitForSeconds(typewriterEffect.GetTypingDuration(secondMessage) + messageDelay);
+            
+            var thirdMessage = "It's time to go and do it..";
+            typewriterEffect.StartTyping(thirdMessage);
+            
+            yield return new WaitForSeconds(typewriterEffect.GetTypingDuration(thirdMessage) + messageDelay);
+            characterInput.enabled = true;
+        }
+
+        private void ShowMessage(string message)
+        {
             if (!string.IsNullOrEmpty(message))
             {
                 textBox.SetActive(true);
@@ -70,8 +109,13 @@ namespace NPC
 
         private void DisableTextBox()
         {
+            if (messageSequenceCoroutine != null)
+            {
+                StopCoroutine(messageSequenceCoroutine);
+                messageSequenceCoroutine = null;
+            }
             typewriterEffect.StopTyping();
-            textBox.SetActive(false);
+            if (textBox != null) textBox.SetActive(false);
         }
     }
 }

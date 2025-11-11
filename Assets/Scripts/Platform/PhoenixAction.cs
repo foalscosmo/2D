@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Player;
 using Player.PlayerMovement;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace Platform
     {
         [SerializeField] private CharacterDetection characterDetection;
         [SerializeField] private Transform spawnPoint;
+        [SerializeField] private PlayerSounds  playerSounds;
 
 
         private void OnEnable()
@@ -26,10 +28,12 @@ namespace Platform
         private void UpdateSpawnPoint(Vector2 point)
         {
             spawnPoint.position =  new  Vector2(point.x, point.y);
+            playerSounds.CheckPointSound();
         }
 
         private void Respawn()
         {
+            playerSounds.DeathSound();
             StartCoroutine(RespawnCoroutine());
         }
 
@@ -38,7 +42,5 @@ namespace Platform
             yield return new WaitForSecondsRealtime(0.5f);
             transform.position = spawnPoint.position;
         }
-        
-        
     }
 }

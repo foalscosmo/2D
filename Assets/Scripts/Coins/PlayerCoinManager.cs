@@ -1,4 +1,5 @@
 using System;
+using Player;
 using Player.PlayerMovement;
 using TMPro;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace Coins
         [SerializeField] private PlayerCoin playerCoin;
         [SerializeField] private CharacterDetection characterDetection;
         [SerializeField] private TextMeshProUGUI coinText;
+        [SerializeField] private PlayerSounds playerSounds;
 
         private void Awake()
         {
@@ -30,6 +32,7 @@ namespace Coins
         {
             playerCoin.AddAmount();
             coinText.text = playerCoin.Amount.ToString();
+            playerSounds.CoinSound();
         }
     }
 }

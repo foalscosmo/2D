@@ -6,25 +6,29 @@ namespace NPC
 {
     public class TypewriterEffect : MonoBehaviour
     {
-        [SerializeField] private float typingSpeed = 0.05f;
-        private TextMeshProUGUI textComponent;
+        [SerializeField] private float typingSpeed;
+        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioClip typingSound;
+        [SerializeField] private float soundPitchMin;
+        [SerializeField] private float soundPitchMax;
+        [SerializeField] private bool playSoundForSpaces = false;
+        
+        [SerializeField] private TextMeshProUGUI textComponent;
         private Coroutine typingCoroutine;
-
-        private void Awake()
-        {
-            textComponent = GetComponent<TextMeshProUGUI>();
-        }
-
+        
         public void StartTyping(string text)
         {
-            // Stop any ongoing typing
             if (typingCoroutine != null)
             {
                 StopCoroutine(typingCoroutine);
             }
             
-            // Start new typing effect
             typingCoroutine = StartCoroutine(TypeText(text));
+        }
+
+        public float GetTypingDuration(string text)
+        {
+            return text.Length * typingSpeed;
         }
 
         public void StopTyping()
@@ -33,6 +37,11 @@ namespace NPC
             {
                 StopCoroutine(typingCoroutine);
                 typingCoroutine = null;
+            }
+            
+            if (audioSource != null)
+            {
+                audioSource.Stop();
             }
         }
 
@@ -43,15 +52,32 @@ namespace NPC
             foreach (char letter in text.ToCharArray())
             {
                 textComponent.text += letter;
+                
+                if (ShouldPlaySound(letter) && audioSource != null && typingSound != null)
+                {
+                    if (audioSource != null)
+                    {
+                        audioSource.pitch = Random.Range(soundPitchMin, soundPitchMax);
+                        audioSource.PlayOneShot(typingSound);
+                    }
+                }
+                
                 yield return new WaitForSeconds(typingSpeed);
             }
             
             typingCoroutine = null;
         }
 
-        public bool IsTyping()
+        private bool ShouldPlaySound(char character)
         {
-            return typingCoroutine != null;
+            if (playSoundForSpaces)
+            {
+                return !char.IsControl(character); 
+            }
+            else
+            {
+                return !char.IsWhiteSpace(character);
+            }
         }
     }
 }
