@@ -66,7 +66,10 @@ namespace Player.PlayerMovement
                     characterAnimation.ChangeAnimationState(characterAnimation.runAnim, 0f);
                     break;
                 case 0:
-                    characterAnimation.ChangeAnimationState(characterAnimation.idleAnim, 0f);
+                    if (!characterInput.MoveLeft.action.IsPressed() && !characterInput.MoveRight.action.IsPressed())
+                    {
+                         characterAnimation.ChangeAnimationState(characterAnimation.idleAnim, 0f);
+                    }
                     break;
             }
         }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Player.PlayerMovement // Namespace for managing player movement
@@ -12,6 +13,8 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         [SerializeField] private Transform headTransformForLedge; // Reference to head transform for ledge detection
         [SerializeField] private Transform bodyTransformForWall; // Reference to body transform for wall detection
 
+        [SerializeField] private LayerMask coin;
+        public event Action OnCoinCollected;
         public Vector2 RayDirection { get; set; }
 
         [field: Header("Ray")] // Header for organization in Unity Inspector
@@ -116,6 +119,14 @@ namespace Player.PlayerMovement // Namespace for managing player movement
                 isDefaultParent = true;
                 isLedgeParent = false;
                 isPlatformParent = false;
+            }
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if ((coin & (1 << other.gameObject.layer)) != 0)
+            {
+                OnCoinCollected?.Invoke();
             }
         }
     }

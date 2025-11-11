@@ -7,9 +7,7 @@ namespace Platform
 {
     public class MovingPlatform : MonoBehaviour, IMovablePlatform
     {
-        [SerializeField] private Transform platform;
-        [SerializeField] private Transform startPos;
-        [SerializeField] private Transform endPos;
+        [SerializeField] private int startPosX, endPosX;
         [SerializeField] private float movingSpeed;
         [SerializeField] private float stopThreshold = 0.01f;
         private int direction = 1;
@@ -22,7 +20,8 @@ namespace Platform
 
         private Vector2 CurrentMovementTarget()
         {
-            return direction == 1 ? endPos.position : startPos.position;
+            return direction == 1 ? new Vector2(transform.position.x + endPosX, transform.position.y) 
+                : new Vector2(transform.position.x + startPosX, transform.position.y);
         }
 
         private void ChangeDirectionIfNeeded(Vector2 target, Vector2 position)
@@ -39,11 +38,11 @@ namespace Platform
 
             var target = CurrentMovementTarget();
             // Calculate duration based on distance and speed
-            var distance = Vector2.Distance(platform.position, target);
+            var distance = Vector2.Distance(transform.position, target);
             var duration = distance / movingSpeed;
 
             // Tween the platform's position
-            platform.DOMove(target, duration).SetEase(Ease.Linear).OnComplete(() =>
+            transform.DOMove(target, duration).SetEase(Ease.Linear).OnComplete(() =>
             {
                 ChangeDirectionIfNeeded(target, target);
                 Move(); // Move again after reaching the target

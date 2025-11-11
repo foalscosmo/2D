@@ -20,7 +20,6 @@ namespace Player.PlayerMovement
         [SerializeField] private CharacterJump characterJump;
         [SerializeField] private CharacterAnimation characterAnimation;
 
-        //testtesttest
         // Called when the script instance is being loaded
         private void Awake()
         {
@@ -81,7 +80,7 @@ namespace Player.PlayerMovement
         // Loads character data from a save file
         public void LoadData(GameData data)
         {
-            transform.position = data.playerPos;
+           // transform.position = data.playerPos;
         }
 
         // Saves character data to a save file
