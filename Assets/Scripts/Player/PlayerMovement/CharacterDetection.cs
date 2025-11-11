@@ -13,8 +13,9 @@ namespace Player.PlayerMovement // Namespace for managing player movement
         [SerializeField] private Transform headTransformForLedge; // Reference to head transform for ledge detection
         [SerializeField] private Transform bodyTransformForWall; // Reference to body transform for wall detection
 
-        [SerializeField] private LayerMask coin;
         public event Action OnCoinCollected;
+        public event Action OnPlayerDeath;
+        public event Action<Vector2> OnCheckPoint;
         public Vector2 RayDirection { get; set; }
 
         [field: Header("Ray")] // Header for organization in Unity Inspector
@@ -124,9 +125,19 @@ namespace Player.PlayerMovement // Namespace for managing player movement
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if ((coin & (1 << other.gameObject.layer)) != 0)
+            if ((detectionStats.Coin & (1 << other.gameObject.layer)) != 0)
             {
                 OnCoinCollected?.Invoke();
+            }
+            
+            if ((detectionStats.CheckPoint & (1 << other.gameObject.layer)) != 0)
+            {
+                OnCheckPoint?.Invoke(other.transform.position);
+            }
+            
+            if ((detectionStats.Heaven & (1 << other.gameObject.layer)) != 0)
+            {
+                OnPlayerDeath?.Invoke();
             }
         }
     }

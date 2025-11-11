@@ -14,7 +14,7 @@ TagManager:
   - Player
   - Wall
   - Enemy
-  - MegaJumpPlatform
+  - CheckPoint
   - Platform
   - Hell
   - Coin

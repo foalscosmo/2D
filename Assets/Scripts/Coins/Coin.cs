@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ namespace Coins
             rotationTween?.Kill();
             Destroy(gameObject);
         }
-
+        
         private void OnDestroy()
         {
             rotationTween?.Kill();

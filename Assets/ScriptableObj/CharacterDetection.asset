@@ -21,6 +21,15 @@ MonoBehaviour:
   platform:
     serializedVersion: 2
     m_Bits: 1024
+  checkPoint:
+    serializedVersion: 2
+    m_Bits: 512
+  coin:
+    serializedVersion: 2
+    m_Bits: 4096
+  heaven:
+    serializedVersion: 2
+    m_Bits: 2048
   wallCollisionRadius: 0.3
   ledgeLength: 0.3
   isLedgeDetected: 0

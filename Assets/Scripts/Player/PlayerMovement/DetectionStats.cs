@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // Namespace for managing player movement
 namespace Player.PlayerMovement
@@ -12,6 +13,10 @@ namespace Player.PlayerMovement
         [SerializeField] private LayerMask grounded;           // Layer mask for detecting ground
         [SerializeField] private LayerMask wallMask;           // Layer mask for detecting walls
         [SerializeField] private LayerMask platform;           // Layer mask for detecting platforms
+        [SerializeField] private LayerMask checkPoint;
+        [SerializeField] private LayerMask coin;
+        [SerializeField] private LayerMask heaven;
+
 
         [Header("Float")] 
         [SerializeField] private float wallCollisionRadius;    // Radius for detecting wall collisions
@@ -53,6 +58,9 @@ namespace Player.PlayerMovement
         }
         
         public LayerMask Platform => platform;                 // Property for accessing platform layer mask
+        public LayerMask CheckPoint => checkPoint;
+        public LayerMask Coin => coin;
+        public LayerMask Heaven => heaven;
 
         public float WallCollisionRadius
         {
